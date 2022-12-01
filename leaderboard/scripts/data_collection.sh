@@ -1,5 +1,5 @@
 #!/bin/bash
-export CARLA_ROOT= PATH_TO_CARLA
+export CARLA_ROOT=/home/michael/Documents/CITCoM/carla/CARLA
 export CARLA_SERVER=${CARLA_ROOT}/CarlaUE4.sh
 export PYTHONPATH=$PYTHONPATH:${CARLA_ROOT}/PythonAPI
 export PYTHONPATH=$PYTHONPATH:${CARLA_ROOT}/PythonAPI/carla
@@ -19,11 +19,11 @@ export DATA_COLLECTION=True
 
 
 # Roach data collection
-export ROUTES=leaderboard/data/TCP_training_routes/routes_town01.xml
+export ROUTES=leaderboard/data/CITCoM_routes/routes_town01.xml
 export TEAM_AGENT=team_code/roach_ap_agent.py
 export TEAM_CONFIG=roach/config/config_agent.yaml
-export CHECKPOINT_ENDPOINT=data_collect_town01_results.json
-export SCENARIOS=leaderboard/data/scenarios/all_towns_traffic_scenarios.json
+export CHECKPOINT_ENDPOINT=data/data_collect_town01_results.json
+export SCENARIOS=leaderboard/data/CITCoM_scenarios/all_towns_traffic_scenarios.json
 export SAVE_PATH=data/data_collect_town01_results/
 
 
@@ -40,6 +40,5 @@ python3 ${LEADERBOARD_ROOT}/leaderboard/leaderboard_evaluator.py \
 --record=${RECORD_PATH} \
 --resume=${RESUME} \
 --port=${PORT} \
---trafficManagerPort=${TM_PORT}
-
-
+--trafficManagerPort=${TM_PORT} \
+--trafficManagerSeed=200

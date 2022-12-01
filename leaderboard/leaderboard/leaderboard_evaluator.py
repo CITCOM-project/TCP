@@ -27,6 +27,7 @@ import carla
 import copy
 import signal
 
+from srunner.scenariomanager.spawn_npcs import spawn_npcs
 from srunner.scenariomanager.carla_data_provider import *
 from srunner.scenariomanager.timer import GameTime
 from srunner.scenariomanager.watchdog import Watchdog
@@ -235,7 +236,7 @@ class LeaderboardEvaluator(object):
         #     settings.synchronous_mode = False
         #     self.world.apply_settings(settings)
         print(town)
-        try: 
+        try:
             self.world = self.client.load_world(town)
         except Exception as e:
             print(e)
@@ -253,6 +254,8 @@ class LeaderboardEvaluator(object):
         if args.weather != "none":
             assert args.weather in WEATHERS
             CarlaDataProvider.set_weather(WEATHERS[args.weather])
+
+        # spawn_npcs(args.number_of_vehicles, args.number_of_walkers)
 
         self.traffic_manager.set_synchronous_mode(True)
         self.traffic_manager.set_random_device_seed(int(args.trafficManagerSeed))
@@ -509,6 +512,10 @@ def main():
     parser.add_argument("--checkpoint", type=str,
                         default='./simulation_results.json',
                         help="Path to checkpoint used for saving statistics and resuming")
+
+    # NPCs
+    parser.add_argument('-n', '--number-of-vehicles', metavar='N', default=10, type=int, help='number of vehicles (default: 10)')
+    parser.add_argument('-w', '--number-of-walkers', metavar='W', default=50, type=int, help='number of walkers (default: 50)')
 
     arguments = parser.parse_args()
     print("init statistics_manager")
