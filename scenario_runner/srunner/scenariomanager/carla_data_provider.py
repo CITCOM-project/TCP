@@ -16,6 +16,8 @@ import math
 import re
 import numpy.random as random
 from six import iteritems
+import subprocess
+import threading
 
 import carla
 
@@ -422,11 +424,19 @@ class CarlaDataProvider(object):  # pylint: disable=too-many-public-methods
         return CarlaDataProvider._ego_vehicle_route
 
     @staticmethod
-    def generate_spawn_points():
+    def generate_spawn_points(sidewalk=False):
         """
         Generate spawn points for the current map
         """
-        spawn_points = list(CarlaDataProvider.get_map(CarlaDataProvider._world).get_spawn_points())
+        spawn_points = []
+        if sidewalk:
+            for _ in range(1000):
+                spawn_point = carla.Transform()
+                spawn_point.location = CarlaDataProvider._world.get_random_location_from_navigation()
+                spawn_point.location.z = 10
+                spawn_points.append(spawn_point)
+        else:
+            spawn_points = list(CarlaDataProvider.get_map(CarlaDataProvider._world).get_spawn_points())
         CarlaDataProvider._rng.shuffle(spawn_points)
         CarlaDataProvider._spawn_points = spawn_points
         CarlaDataProvider._spawn_index = 0
@@ -641,6 +651,17 @@ class CarlaDataProvider(object):  # pylint: disable=too-many-public-methods
             CarlaDataProvider.register_actor(actor)
         return actors
 
+
+    @staticmethod
+    def spawn_walkers(number):
+        bashCommand = f"../CARLA/PythonAPI/examples/spawn_npc.py -n 0 -w {number}"
+        return subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
+
+    @staticmethod
+    def request_new_batch_walkers(model, amount, spawn_points, autopilot=False,
+                                 random_location=False, rolename='scenario'):
+         return CarlaDataProvider.spawn_walkers(amount)
+
     @staticmethod
     def request_new_batch_actors(model, amount, spawn_points, autopilot=False,
                                  random_location=False, rolename='scenario'):
@@ -658,7 +679,7 @@ class CarlaDataProvider(object):  # pylint: disable=too-many-public-methods
         SetAutopilot = carla.command.SetAutopilot  # pylint: disable=invalid-name
         FutureActor = carla.command.FutureActor    # pylint: disable=invalid-name
 
-        CarlaDataProvider.generate_spawn_points()
+        CarlaDataProvider.generate_spawn_points(sidewalk=model.startswith("walker"))
 
         batch = []
 

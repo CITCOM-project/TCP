@@ -35,6 +35,7 @@ class BasicScenario(object):
         Setup all relevant parameters and create scenario
         and instantiate scenario manager
         """
+        self.world = world
         self.other_actors = []
         if not self.timeout:     # pylint: disable=access-member-before-definition
             self.timeout = 60    # If no timeout was provided, set it to 60 seconds
@@ -48,9 +49,11 @@ class BasicScenario(object):
         self.terminate_on_failure = terminate_on_failure
 
         self._initialize_environment(world)
+        print("_initialize_environment", self.count_actors())
 
         # Initializing adversarial actors
         self._initialize_actors(config)
+        print("_initialize_actors", self.count_actors())
         if CarlaDataProvider.is_sync_mode():
             world.tick()
         else:
@@ -81,6 +84,12 @@ class BasicScenario(object):
             behavior_seq.add_child(end_behavior)
 
         self.scenario = Scenario(behavior_seq, criteria, self.name, self.timeout, self.terminate_on_failure)
+
+    def count_actors(self):
+        counts = {}
+        for a in self.world.get_actors():
+            counts[a.type_id] = counts.get(a.type_id, 0) + 1
+        return counts
 
     def _initialize_environment(self, world):
         """

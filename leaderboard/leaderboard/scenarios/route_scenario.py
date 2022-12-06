@@ -188,10 +188,14 @@ class RouteScenario(BasicScenario):
 		self.config = config
 		self.route = None
 		self.sampled_scenarios_definitions = None
+		self.world = world
+		self.walker_thread = None
 
 		self._update_route(world, config, debug_mode>0)
 
 		ego_vehicle = self._update_ego_vehicle()
+
+		print("ego_vehicle", self.count_actors())
 
 		self.list_scenarios = self._build_scenario_instances(world,
 															 ego_vehicle,
@@ -199,6 +203,7 @@ class RouteScenario(BasicScenario):
 															 scenarios_per_tick=10,
 															 timeout=self.timeout,
 															 debug_mode=debug_mode>1)
+		print("list_scenarios", self.count_actors())
 
 
 		super(RouteScenario, self).__init__(name=config.name,
@@ -490,12 +495,20 @@ class RouteScenario(BasicScenario):
 
 		amount = town_amount[config.town] if config.town in town_amount else 0
 
+		self.walker_thread = CarlaDataProvider.request_new_batch_walkers('walker.*',
+																amount,
+																carla.Transform(),
+																autopilot=True,
+																random_location=True,
+																rolename='background')
+
 		new_actors = CarlaDataProvider.request_new_batch_actors('vehicle.*',
 																amount,
 																carla.Transform(),
 																autopilot=True,
 																random_location=True,
 																rolename='background')
+		print("\nnew_actors", new_actors[0])
 		if new_actors is None:
 			raise Exception("Error: Unable to add the background activity, all spawn points were occupied")
 
@@ -569,7 +582,7 @@ class RouteScenario(BasicScenario):
 									  route=route,
 									  offroad_max=30,
 									  terminate_on_failure=True)
-									  
+
 		completion_criterion = RouteCompletionTest(self.ego_vehicles[0], route=route)
 
 		outsidelane_criterion = OutsideRouteLanesTest(self.ego_vehicles[0], route=route)
@@ -596,4 +609,6 @@ class RouteScenario(BasicScenario):
 		"""
 		Remove all actors upon deletion
 		"""
+		if self.walker_thread is not None:
+			self.walker_thread.kill()
 		self.remove_all_actors()

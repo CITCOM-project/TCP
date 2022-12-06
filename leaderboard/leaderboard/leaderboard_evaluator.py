@@ -27,7 +27,6 @@ import carla
 import copy
 import signal
 
-from srunner.scenariomanager.spawn_npcs import spawn_npcs
 from srunner.scenariomanager.carla_data_provider import *
 from srunner.scenariomanager.timer import GameTime
 from srunner.scenariomanager.watchdog import Watchdog
@@ -89,6 +88,12 @@ class LeaderboardEvaluator(object):
     client_timeout = 10.0  # in seconds
     wait_for_world = 20.0  # in seconds
     frame_rate = 20.0      # in Hz
+
+    def count_actors(self):
+        counts = {}
+        for a in self.world.get_actors():
+            counts[a.type_id] = counts.get(a.type_id, 0) + 1
+        return counts
 
     def __init__(self, args, statistics_manager):
         """
@@ -180,8 +185,8 @@ class LeaderboardEvaluator(object):
                 self.ego_vehicles[i] = None
         self.ego_vehicles = []
 
-        if self._agent_watchdog:
-            self._agent_watchdog.stop()
+        # if self._agent_watchdog:
+        #     self._agent_watchdog.stop()
 
         if hasattr(self, 'agent_instance') and self.agent_instance:
             self.agent_instance.destroy()
@@ -266,9 +271,11 @@ class LeaderboardEvaluator(object):
         else:
             self.world.wait_for_tick()
 
+
         if CarlaDataProvider.get_map().name != town:
             raise Exception("The CARLA server uses the wrong map!"
                             "This scenario requires to use map {}".format(town))
+        print("loaded_world", self.count_actors())
 
     def _register_statistics(self, config, checkpoint, entry_status, crash_message=""):
         """
@@ -351,8 +358,11 @@ class LeaderboardEvaluator(object):
         # Load the world and the scenario
         try:
             self._load_and_wait_for_world(args, config.town, config.ego_vehicles)
+            print("_load_and_wait_for_world", self.count_actors())
             self._prepare_ego_vehicles(config.ego_vehicles, False)
+            print("_prepare_ego_vehicles", self.count_actors())
             scenario = RouteScenario(world=self.world, config=config, debug_mode=args.debug)
+            print("RouteScenario", self.count_actors())
             self.statistics_manager.set_scenario(scenario.scenario)
 
             # self.agent_instance._init()
@@ -367,6 +377,8 @@ class LeaderboardEvaluator(object):
             if args.record:
                 self.client.start_recorder("{}/{}_rep{}.log".format(args.record, config.name, config.repetition_index))
             self.manager.load_scenario(scenario, self.agent_instance, config.repetition_index)
+            print("load_scenario", self.count_actors())
+
 
         except Exception as e:
             # The scenario is wrong -> set the ejecution to crashed and stop
@@ -386,6 +398,7 @@ class LeaderboardEvaluator(object):
             sys.exit(-1)
 
         print("\033[1m> Running the route\033[0m")
+        print(self.count_actors())
 
         # Run the scenario
         # try:
