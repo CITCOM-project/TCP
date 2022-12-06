@@ -18,6 +18,7 @@ import os
 import py_trees
 
 import carla
+import re
 
 from agents.navigation.local_planner import RoadOption
 
@@ -195,16 +196,12 @@ class RouteScenario(BasicScenario):
 
 		ego_vehicle = self._update_ego_vehicle()
 
-		print("ego_vehicle", self.count_actors())
-
 		self.list_scenarios = self._build_scenario_instances(world,
 															 ego_vehicle,
 															 self.sampled_scenarios_definitions,
 															 scenarios_per_tick=10,
 															 timeout=self.timeout,
 															 debug_mode=debug_mode>1)
-		print("list_scenarios", self.count_actors())
-
 
 		super(RouteScenario, self).__init__(name=config.name,
 											ego_vehicles=[ego_vehicle],
@@ -503,12 +500,13 @@ class RouteScenario(BasicScenario):
 																rolename='background')
 
 		new_actors = CarlaDataProvider.request_new_batch_actors('vehicle.*',
-																amount,
+																0,
+																# amount,
 																carla.Transform(),
 																autopilot=True,
 																random_location=True,
 																rolename='background')
-		print("\nnew_actors", new_actors[0])
+		print("walkers", self.count_actors())
 		if new_actors is None:
 			raise Exception("Error: Unable to add the background activity, all spawn points were occupied")
 
@@ -611,4 +609,12 @@ class RouteScenario(BasicScenario):
 		"""
 		if self.walker_thread is not None:
 			self.walker_thread.kill()
+			stdout, stderr = self.walker_thread.communicate()
+			print("stdout", stdout)
+			print("stderr", stderr)
+			match = re.search(r"spawned (\d+) vehicles and (\d+) walkers", str(stdout)+str(stderr))
+			if match:
+				print("STDOUT", stdout)
+				print("MATCH", match)
+				print(f"SPAWNED {match.group(1)} extra vehicles and {match.group(2)} pedestrians")
 		self.remove_all_actors()

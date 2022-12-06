@@ -654,8 +654,9 @@ class CarlaDataProvider(object):  # pylint: disable=too-many-public-methods
 
     @staticmethod
     def spawn_walkers(number):
-        bashCommand = f"../CARLA/PythonAPI/examples/spawn_npc.py -n 0 -w {number}"
-        return subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
+        bashCommand = f"python scenario_runner/srunner/scenariomanager/spawn_npc.py  -n 0 -w {number}"
+        return subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        # spawn_npcs(CarlaDataProvider._client, number)
 
     @staticmethod
     def request_new_batch_walkers(model, amount, spawn_points, autopilot=False,

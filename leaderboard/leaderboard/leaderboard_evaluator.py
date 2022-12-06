@@ -358,11 +358,8 @@ class LeaderboardEvaluator(object):
         # Load the world and the scenario
         try:
             self._load_and_wait_for_world(args, config.town, config.ego_vehicles)
-            print("_load_and_wait_for_world", self.count_actors())
             self._prepare_ego_vehicles(config.ego_vehicles, False)
-            print("_prepare_ego_vehicles", self.count_actors())
             scenario = RouteScenario(world=self.world, config=config, debug_mode=args.debug)
-            print("RouteScenario", self.count_actors())
             self.statistics_manager.set_scenario(scenario.scenario)
 
             # self.agent_instance._init()
@@ -377,7 +374,6 @@ class LeaderboardEvaluator(object):
             if args.record:
                 self.client.start_recorder("{}/{}_rep{}.log".format(args.record, config.name, config.repetition_index))
             self.manager.load_scenario(scenario, self.agent_instance, config.repetition_index)
-            print("load_scenario", self.count_actors())
 
 
         except Exception as e:
@@ -398,7 +394,6 @@ class LeaderboardEvaluator(object):
             sys.exit(-1)
 
         print("\033[1m> Running the route\033[0m")
-        print(self.count_actors())
 
         # Run the scenario
         # try:
