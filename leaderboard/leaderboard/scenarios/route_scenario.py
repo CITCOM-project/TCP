@@ -191,6 +191,8 @@ class RouteScenario(BasicScenario):
 		self.sampled_scenarios_definitions = None
 		self.world = world
 		self.walker_thread = None
+		self.number_of_walkers = None
+		self.number_of_drivers = None
 
 		self._update_route(world, config, debug_mode>0)
 
@@ -506,12 +508,11 @@ class RouteScenario(BasicScenario):
 																autopilot=True,
 																random_location=True,
 																rolename='background')
-		print("walkers", self.count_actors())
+
+		self.drivers = new_actors
+
 		if new_actors is None:
 			raise Exception("Error: Unable to add the background activity, all spawn points were occupied")
-
-		for _actor in new_actors:
-			self.other_actors.append(_actor)
 
 		# Add all the actors of the specific scenarios to self.other_actors
 		for scenario in self.list_scenarios:
@@ -603,18 +604,23 @@ class RouteScenario(BasicScenario):
 
 		return criteria
 
+	def set_number_of_walkers(self):
+		if self.walker_thread is not None:
+			self.walker_thread.kill()
+		stdout, stderr = self.walker_thread.communicate()
+		print("stdout", stdout)
+		print("stderr", stderr)
+		match = re.search(r"spawned (\d+) vehicles and (\d+) walkers", str(stdout)+str(stderr))
+		walkers = None
+		# assert match, "Could not find number of walkers"
+		if match:
+		    print("STDOUT", stdout)
+		    print("MATCH", match)
+		    print(f"SPAWNED {match.group(1)} extra vehicles and {match.group(2)} pedestrians")
+		    self.number_of_walkers = int(match.group(2))
+
 	def __del__(self):
 		"""
 		Remove all actors upon deletion
 		"""
-		if self.walker_thread is not None:
-			self.walker_thread.kill()
-			stdout, stderr = self.walker_thread.communicate()
-			print("stdout", stdout)
-			print("stderr", stderr)
-			match = re.search(r"spawned (\d+) vehicles and (\d+) walkers", str(stdout)+str(stderr))
-			if match:
-				print("STDOUT", stdout)
-				print("MATCH", match)
-				print(f"SPAWNED {match.group(1)} extra vehicles and {match.group(2)} pedestrians")
 		self.remove_all_actors()

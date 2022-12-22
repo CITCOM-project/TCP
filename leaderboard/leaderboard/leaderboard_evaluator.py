@@ -104,6 +104,7 @@ class LeaderboardEvaluator(object):
         self.sensors = None
         self.sensor_icons = []
         self._vehicle_lights = carla.VehicleLightState.Position | carla.VehicleLightState.LowBeam
+        self.percentage_speed_limit = args.percentSpeedLimit
 
         # First of all, we need to create the client that will send the requests
         # to the simulator. Here we'll assume the simulator is accepting
@@ -260,8 +261,6 @@ class LeaderboardEvaluator(object):
             assert args.weather in WEATHERS
             CarlaDataProvider.set_weather(WEATHERS[args.weather])
 
-        # spawn_npcs(args.number_of_vehicles, args.number_of_walkers)
-
         self.traffic_manager.set_synchronous_mode(True)
         self.traffic_manager.set_random_device_seed(int(args.trafficManagerSeed))
 
@@ -282,8 +281,10 @@ class LeaderboardEvaluator(object):
         Computes and saved the simulation statistics
         """
         # register statistics
+        assert self.percentage_speed_limit == 70
         current_stats_record = self.statistics_manager.compute_route_statistics(
             config,
+            self.percentage_speed_limit,
             self.manager.scenario_duration_system,
             self.manager.scenario_duration_game,
             crash_message
@@ -361,6 +362,8 @@ class LeaderboardEvaluator(object):
             self._prepare_ego_vehicles(config.ego_vehicles, False)
             scenario = RouteScenario(world=self.world, config=config, debug_mode=args.debug)
             self.statistics_manager.set_scenario(scenario.scenario)
+            scenario.scenario.number_of_drivers = len(scenario.drivers)
+
 
             # self.agent_instance._init()
             # self.agent_instance.sensor_interface = SensorInterface()
@@ -375,6 +378,8 @@ class LeaderboardEvaluator(object):
                 self.client.start_recorder("{}/{}_rep{}.log".format(args.record, config.name, config.repetition_index))
             self.manager.load_scenario(scenario, self.agent_instance, config.repetition_index)
 
+            for d in scenario.ego_vehicles:
+                self.traffic_manager.vehicle_percentage_speed_difference(d, 100 - args.percentSpeedLimit)
 
         except Exception as e:
             # The scenario is wrong -> set the ejecution to crashed and stop
@@ -418,7 +423,11 @@ class LeaderboardEvaluator(object):
         # Stop the scenario
         try:
             print("\033[1m> Stopping the route\033[0m")
+            scenario.set_number_of_walkers()
+            scenario.count_actors()
             self.manager.stop_scenario()
+            # assert scenario.number_of_walkers is not None, "Scenario number_of_walkers is none"
+            scenario.scenario.number_of_walkers = scenario.number_of_walkers
             self._register_statistics(config, args.checkpoint, entry_status, crash_message)
 
             if args.record:
@@ -524,6 +533,10 @@ def main():
     # NPCs
     parser.add_argument('-n', '--number-of-vehicles', metavar='N', default=10, type=int, help='number of vehicles (default: 10)')
     parser.add_argument('-w', '--number-of-walkers', metavar='W', default=50, type=int, help='number of walkers (default: 50)')
+    parser.add_argument('--percentSpeedLimit',
+                        type=int,
+                        default=70,
+                        help='The percentage of the speed limit at which the other vehicles should travel.')
 
     arguments = parser.parse_args()
     print("init statistics_manager")

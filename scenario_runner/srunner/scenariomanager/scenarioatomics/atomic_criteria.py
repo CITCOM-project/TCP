@@ -282,6 +282,10 @@ class AverageVelocityTest(Criterion):
         super(AverageVelocityTest, self).terminate(new_status)
 
 
+def length(v):
+    return math.sqrt((v.x ** 2) + (v.y ** 2) + (v.z ** 2))
+
+
 class CollisionTest(Criterion):
 
     """
@@ -417,12 +421,9 @@ class CollisionTest(Criterion):
             'y': actor_location.y,
             'z': actor_location.z})
         collision_event.set_message(
-            "Agent collided against object with type={} and id={} at (x={}, y={}, z={})".format(
-                event.other_actor.type_id,
-                event.other_actor.id,
-                round(actor_location.x, 3),
-                round(actor_location.y, 3),
-                round(actor_location.z, 3)))
+            f"Agent with velocity {length(event.actor.get_velocity())} collided against object with type={event.other_actor.type_id} "+
+            f"and id={event.other_actor.id} and velocity {length(event.other_actor.get_velocity())} at (x={round(actor_location.x, 3)}, y={round(actor_location.y, 3)}, z={round(actor_location.z, 3)})"
+            )
 
         self.test_status = "FAILURE"
         self.actual_value += 1

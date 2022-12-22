@@ -51,6 +51,10 @@ class RouteRecord():
 
         self.meta = {}
 
+        self.weather = {}
+        self.town = None
+        self.friction = None
+
 
 def to_route_record(record_dict):
     record = RouteRecord()
@@ -115,7 +119,7 @@ class StatisticsManager(object):
         """
         self._master_scenario = scenario
 
-    def compute_route_statistics(self, config, duration_time_system=-1, duration_time_game=-1, failure=""):
+    def compute_route_statistics(self, config, percentage_speed_limit=-1, duration_time_system=-1, duration_time_game=-1, failure=""):
         """
         Compute the current statistics by evaluating all relevant scenario criteria
         """
@@ -135,7 +139,26 @@ class StatisticsManager(object):
         route_record.meta['duration_game'] = duration_time_game
         route_record.meta['route_length'] = compute_route_length(config)
 
+        # assert self._master_scenario.number_of_walkers is not None, "Number of walkers is None"
+        route_record.meta['number_of_walkers'] = self._master_scenario.number_of_walkers
+        route_record.meta['number_of_drivers'] = self._master_scenario.number_of_drivers
+        route_record.meta['percentage_speed_limit'] = percentage_speed_limit
+
         route_record.meta['total_steps'] = config.agent.step
+
+        route_record.weather["cloudiness"] = config.weather.cloudiness
+        route_record.weather["precipitation"] = config.weather.precipitation
+        route_record.weather["precipitation_deposits"] = config.weather.precipitation_deposits
+        route_record.weather["wind_intensity"] = config.weather.wind_intensity
+        route_record.weather["sun_azimuth_angle"] = config.weather.sun_azimuth_angle
+        route_record.weather["sun_altitude_angle"] = config.weather.sun_altitude_angle
+        route_record.weather["fog_density"] = config.weather.fog_density
+        route_record.weather["fog_distance"] = config.weather.fog_distance
+        route_record.weather["fog_falloff"] = config.weather.fog_falloff
+        route_record.weather["wetness"] = config.weather.wetness
+
+        route_record.town = config.town
+        route_record.friction = config.friction
 
         if self._master_scenario:
             if self._master_scenario.timeout_node.timeout:

@@ -1,0 +1,28 @@
+{
+  "tests": [
+    {
+      "name": "cloudiness_collisions_vehicle",
+      "mutations": {"cloudiness": "Increase"},
+      "estimator": "LogisticRegressionEstimator",
+      "estimate_type": "ate",
+      "expectedEffect": {"collisions_vehicle": "NoEffect"},
+      "skip": true
+    },
+    {
+      "name": "precipitation_collisions_vehicle",
+      "mutations": {"precipitation": "Plus5"},
+      "estimator": "LogisticRegressionEstimator",
+      "estimate_type": "ate",
+      "expectedEffect": {"collisions_vehicle": "NoEffect"},
+      "skip": true
+    },
+    {
+      "name": "wind_intensity_collisions_vehicle",
+      "mutations": {"wind_intensity": "Increase"},
+      "estimator": "LogisticRegressionEstimator",
+      "estimate_type": "ate",
+      "expectedEffect": {"collisions_vehicle": "NoEffect"},
+      "skip": false
+    }
+  ]
+}

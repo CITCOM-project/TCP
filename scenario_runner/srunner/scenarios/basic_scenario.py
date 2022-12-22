@@ -236,7 +236,9 @@ class Scenario(object):
         self.test_criteria = criteria
         self.timeout = timeout
         self.name = name
-
+        self.number_of_walkers = None
+        self.number_of_drivers = None
+        
         if self.test_criteria is not None and not isinstance(self.test_criteria, py_trees.composites.Parallel):
             # list of nodes
             for criterion in self.test_criteria:

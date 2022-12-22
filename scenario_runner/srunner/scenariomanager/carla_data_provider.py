@@ -661,7 +661,8 @@ class CarlaDataProvider(object):  # pylint: disable=too-many-public-methods
     @staticmethod
     def request_new_batch_walkers(model, amount, spawn_points, autopilot=False,
                                  random_location=False, rolename='scenario'):
-         return CarlaDataProvider.spawn_walkers(amount)
+        walker_thread = CarlaDataProvider.spawn_walkers(amount)
+        return walker_thread
 
     @staticmethod
     def request_new_batch_actors(model, amount, spawn_points, autopilot=False,
