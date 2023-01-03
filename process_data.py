@@ -9,8 +9,10 @@ Created on Wed Dec 14 09:32:32 2022
 import pandas as pd
 import json
 import re
+import sys
 
-RESULTS_FILE = "data/CITCoM_data_collect_town01_results/data_collect_town01_results.json"
+# RESULTS_FILE = "data/CITCoM_data_collect_town01_results/data_collect_town01_results.json"
+RESULTS_FILE = sys.argv[1]
 
 collision_re = re.compile(r"Agent with velocity (\d+\.\d+) collided against object with type=\w+\.\w+\.\w+ and id=\d+ and velocity (\d+\.\d+(e-?\d+)?) at")
 
