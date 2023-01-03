@@ -502,8 +502,8 @@ class RouteScenario(BasicScenario):
 																rolename='background')
 
 		new_actors = CarlaDataProvider.request_new_batch_actors('vehicle.*',
-																0,
-																# amount,
+																# 0,
+																amount,
 																carla.Transform(),
 																autopilot=True,
 																random_location=True,
