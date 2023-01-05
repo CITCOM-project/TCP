@@ -74,7 +74,9 @@ mutates = {
     "Plus5": lambda x: modelling_scenario.treatment_variables[x].z3 ==
                           modelling_scenario.variables[x].z3 + 5,
     "Plus10": lambda x: modelling_scenario.treatment_variables[x].z3 ==
-                          modelling_scenario.variables[x].z3 + 10
+                          modelling_scenario.variables[x].z3 + 10,
+    "Plus20": lambda x: modelling_scenario.treatment_variables[x].z3 ==
+                          modelling_scenario.variables[x].z3 + 20
 }
 
 

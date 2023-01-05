@@ -469,6 +469,9 @@ class LeaderboardEvaluator(object):
             # setup
             config = route_indexer.next()
 
+            if config.name != args.routeScenario:
+                continue
+
             # run
             self._load_and_run_scenario(args, config)
 
@@ -546,6 +549,10 @@ def main():
                         type=int,
                         default=None,
                         help='The number of walkers.')
+    parser.add_argument('--routeScenario',
+                        type=str,
+                        default=None,
+                        help='A specific scenario to run.')
     arguments = parser.parse_args()
     print("init statistics_manager")
     statistics_manager = StatisticsManager()

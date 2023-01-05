@@ -25,8 +25,24 @@
       "skip": true
     },
     {
-      "name": "percentage_speed_limit_red_light",
+      "name": "percentage_speed_limit_collisions_vehicle",
       "mutations": {"percentage_speed_limit": "Plus10"},
+      "estimator": "LogisticRegressionEstimator",
+      "estimate_type": "ate",
+      "expectedEffect": {"collisions_vehicle": "NoEffect"},
+      "skip": true
+    },
+    {
+      "name": "number_of_walkers_red_light",
+      "mutations": {"number_of_walkers": "Plus20"},
+      "estimator": "LogisticRegressionEstimator",
+      "estimate_type": "ate",
+      "expectedEffect": {"red_light": "NoEffect"},
+      "skip": true
+    },
+    {
+      "name": "number_of_walkers_collisions_vehicle",
+      "mutations": {"number_of_walkers": "Plus20"},
       "estimator": "LinearRegressionEstimator",
       "estimate_type": "ate",
       "expectedEffect": {"collisions_vehicle": "NoEffect"},
