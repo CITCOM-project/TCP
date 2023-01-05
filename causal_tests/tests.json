@@ -22,6 +22,14 @@
       "estimator": "LogisticRegressionEstimator",
       "estimate_type": "ate",
       "expectedEffect": {"collisions_vehicle": "NoEffect"},
+      "skip": true
+    },
+    {
+      "name": "percentage_speed_limit_red_light",
+      "mutations": {"percentage_speed_limit": "Plus10"},
+      "estimator": "LinearRegressionEstimator",
+      "estimate_type": "ate",
+      "expectedEffect": {"collisions_vehicle": "NoEffect"},
       "skip": false
     }
   ]

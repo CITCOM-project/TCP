@@ -623,4 +623,11 @@ class RouteScenario(BasicScenario):
 		"""
 		Remove all actors upon deletion
 		"""
+		walker_count = 0
+		for actor in self.world.get_actors():
+			if actor.type_id.startswith("walker."):
+				walker_count += 1
+				actor.destroy()
 		self.remove_all_actors()
+		if self.walker_thread is not None:
+			self.walker_thread.kill()

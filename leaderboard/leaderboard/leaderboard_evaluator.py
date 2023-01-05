@@ -281,7 +281,6 @@ class LeaderboardEvaluator(object):
         Computes and saved the simulation statistics
         """
         # register statistics
-        assert self.percentage_speed_limit == 70
         current_stats_record = self.statistics_manager.compute_route_statistics(
             config,
             self.percentage_speed_limit,

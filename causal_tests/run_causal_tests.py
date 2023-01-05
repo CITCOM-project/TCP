@@ -12,6 +12,7 @@ from causal_testing.specification.variable import Input, Output
 
 
 inputs = [
+    {"name": "percentage_speed_limit", "type": float, "distribution": scipy.stats.uniform(0, 100)},
     {"name": "cloudiness", "type": float, "distribution": scipy.stats.uniform(0, 100)},
     {"name": "fog_density", "type": float, "distribution": scipy.stats.uniform(0, 100)},
     {"name": "fog_distance", "type": float, "distribution": scipy.stats.uniform(0, 100)},
@@ -23,7 +24,7 @@ inputs = [
     {"name": "sun_altitude_angle", "type": float, "distribution": scipy.stats.uniform(0, 180)},
     {"name": "sun_azimuth_angle", "type": float, "distribution": scipy.stats.uniform(0, 180)},
     {"name": "wetness", "type": float, "distribution": scipy.stats.uniform(0, 100)},
-    {"name": "wind_intensity", "type": float, "distribution": scipy.stats.uniform(0, 100)}
+    {"name": "wind_intensity", "type": float, "distribution": scipy.stats.uniform(0, 1)}
 ]
 
 
@@ -65,12 +66,15 @@ vnames["wind_intensity"].z3 >= 0.3]
 # Create modelling scenario to access z3 variable mirrors
 modelling_scenario = Scenario(variables, constraints)
 modelling_scenario.setup_treatment_variables()
+print(modelling_scenario.variables)
 
 mutates = {
     "Increase": lambda x: modelling_scenario.treatment_variables[x].z3 >
                           modelling_scenario.variables[x].z3,
     "Plus5": lambda x: modelling_scenario.treatment_variables[x].z3 ==
-                          modelling_scenario.variables[x].z3 + 5
+                          modelling_scenario.variables[x].z3 + 5,
+    "Plus10": lambda x: modelling_scenario.treatment_variables[x].z3 ==
+                          modelling_scenario.variables[x].z3 + 10
 }
 
 
