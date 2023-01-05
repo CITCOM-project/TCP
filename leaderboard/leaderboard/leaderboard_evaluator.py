@@ -105,6 +105,8 @@ class LeaderboardEvaluator(object):
         self.sensor_icons = []
         self._vehicle_lights = carla.VehicleLightState.Position | carla.VehicleLightState.LowBeam
         self.percentage_speed_limit = args.percentSpeedLimit
+        self.ideal_number_of_drivers = args.numberOfDrivers
+        self.ideal_number_of_walkers = args.numberOfWalkers
 
         # First of all, we need to create the client that will send the requests
         # to the simulator. Here we'll assume the simulator is accepting
@@ -359,7 +361,7 @@ class LeaderboardEvaluator(object):
         try:
             self._load_and_wait_for_world(args, config.town, config.ego_vehicles)
             self._prepare_ego_vehicles(config.ego_vehicles, False)
-            scenario = RouteScenario(world=self.world, config=config, debug_mode=args.debug)
+            scenario = RouteScenario(world=self.world, config=config, debug_mode=args.debug, ideal_number_of_drivers=self.ideal_number_of_drivers, ideal_number_of_walkers=self.ideal_number_of_walkers)
             self.statistics_manager.set_scenario(scenario.scenario)
             scenario.scenario.number_of_drivers = len(scenario.drivers)
 
@@ -536,7 +538,14 @@ def main():
                         type=int,
                         default=70,
                         help='The percentage of the speed limit at which the other vehicles should travel.')
-
+    parser.add_argument('--numberOfDrivers',
+                        type=int,
+                        default=None,
+                        help='The number of other drivers on the road.')
+    parser.add_argument('--numberOfWalkers',
+                        type=int,
+                        default=None,
+                        help='The number of walkers.')
     arguments = parser.parse_args()
     print("init statistics_manager")
     statistics_manager = StatisticsManager()

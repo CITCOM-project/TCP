@@ -49,4 +49,6 @@ python3 ${LEADERBOARD_ROOT}/leaderboard/leaderboard_evaluator.py \
 --port=${PORT} \
 --trafficManagerPort=${TM_PORT} \
 --trafficManagerSeed=200 \
---percentSpeedLimit=$4
+--percentSpeedLimit=$4 \
+--numberOfDrivers=$5 \
+--numberOfWalkers=$6

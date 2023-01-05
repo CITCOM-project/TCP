@@ -182,7 +182,7 @@ class RouteScenario(BasicScenario):
 
 	category = "RouteScenario"
 
-	def __init__(self, world, config, debug_mode=0, criteria_enable=True):
+	def __init__(self, world, config, debug_mode=0, criteria_enable=True, ideal_number_of_drivers=None, ideal_number_of_walkers=None):
 		"""
 		Setup all relevant parameters and create scenarios along route
 		"""
@@ -193,6 +193,8 @@ class RouteScenario(BasicScenario):
 		self.walker_thread = None
 		self.number_of_walkers = None
 		self.number_of_drivers = None
+		self.ideal_number_of_drivers = ideal_number_of_drivers
+		self.ideal_number_of_walkers = ideal_number_of_walkers
 
 		self._update_route(world, config, debug_mode>0)
 
@@ -492,18 +494,21 @@ class RouteScenario(BasicScenario):
 			'Town10HD': 120, # town10 doesn't load properly for some reason
 		}
 
-		amount = town_amount[config.town] if config.town in town_amount else 0
+		# amount = town_amount[config.town] if config.town in town_amount else 0
+		num_drivers = self.ideal_number_of_drivers if self.ideal_number_of_drivers is not None else town_amount.get(config.town, 0)
+		num_walkers = self.ideal_number_of_walkers if self.ideal_number_of_walkers is not None else town_amount.get(config.town, 0)
+
+		assert self.ideal_number_of_drivers is not None, "None drivers"
 
 		self.walker_thread = CarlaDataProvider.request_new_batch_walkers('walker.*',
-																amount,
+																num_walkers,
 																carla.Transform(),
 																autopilot=True,
 																random_location=True,
 																rolename='background')
 
 		new_actors = CarlaDataProvider.request_new_batch_actors('vehicle.*',
-																# 0,
-																amount,
+																num_drivers,
 																carla.Transform(),
 																autopilot=True,
 																random_location=True,
