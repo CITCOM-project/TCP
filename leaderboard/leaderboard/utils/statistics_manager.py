@@ -119,7 +119,7 @@ class StatisticsManager(object):
         """
         self._master_scenario = scenario
 
-    def compute_route_statistics(self, config, percentage_speed_limit=-1, duration_time_system=-1, duration_time_game=-1, failure=""):
+    def compute_route_statistics(self, config, percentage_speed_limit=-1, duration_time_system=-1, duration_time_game=-1, ego_vehicle="", failure=""):
         """
         Compute the current statistics by evaluating all relevant scenario criteria
         """
@@ -143,6 +143,7 @@ class StatisticsManager(object):
         route_record.meta['number_of_walkers'] = self._master_scenario.number_of_walkers
         route_record.meta['number_of_drivers'] = self._master_scenario.number_of_drivers
         route_record.meta['percentage_speed_limit'] = percentage_speed_limit
+        route_record.meta['ego_vehicle'] = ego_vehicle
 
         route_record.meta['total_steps'] = config.agent.step
 

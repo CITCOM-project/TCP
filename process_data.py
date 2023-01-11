@@ -14,13 +14,11 @@ import sys
 # RESULTS_FILE = "data/CITCoM_data_collect_town01_results/data_collect_town01_results.json"
 RESULTS_FILE = sys.argv[1]
 
-collision_re = re.compile(r"Agent with velocity (\d+\.\d+((e-?\d+)?)) collided against object with type=\w+\.\w+\.\w+ and id=\d+ and velocity (\d+\.\d+((e-?\d+)?)) at")
+collision_re = re.compile(r"Agent with velocity (\d+\.\d+((e-?\d+)?)) collided against object with type=\w+\.[\w-]+\.\w+ and id=\d+ and velocity (\d+\.\d+((e-?\d+)?)) at")
 
 
 def get_velocity(collision):
     match = collision_re.match(collision)
-    print(collision)
-    print(match.groups())
     assert match is not None, f"COULD NOT MATCH '{collision}'"
     return float(match.group(1)), float(match.group(4))
 

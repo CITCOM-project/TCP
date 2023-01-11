@@ -285,10 +285,11 @@ class LeaderboardEvaluator(object):
         # register statistics
         current_stats_record = self.statistics_manager.compute_route_statistics(
             config,
-            self.percentage_speed_limit,
-            self.manager.scenario_duration_system,
-            self.manager.scenario_duration_game,
-            crash_message
+            percentage_speed_limit=self.percentage_speed_limit,
+            duration_time_system=self.manager.scenario_duration_system,
+            duration_time_game=self.manager.scenario_duration_game,
+            ego_vehicle=self.ego_vehicle.type_id,
+            failure=crash_message
         )
 
         print("\033[1m> Registering the route statistics\033[0m")
@@ -365,6 +366,8 @@ class LeaderboardEvaluator(object):
             self.statistics_manager.set_scenario(scenario.scenario)
             scenario.scenario.number_of_drivers = len(scenario.drivers)
 
+            # Hack to get the ego vehicle into the stats manager
+            self.ego_vehicle = scenario.ego_vehicles[0]
 
             # self.agent_instance._init()
             # self.agent_instance.sensor_interface = SensorInterface()
@@ -469,7 +472,7 @@ class LeaderboardEvaluator(object):
             # setup
             config = route_indexer.next()
 
-            if config.name != args.routeScenario:
+            if args.routeScenario is not None and config.name != args.routeScenario:
                 continue
 
             # run

@@ -1798,6 +1798,9 @@ class RunningRedLightTest(Criterion):
                     rgt_lane_wp = location_wp + carla.Location(rgt_lane_wp)
 
                     # Is the vehicle traversing the stop line?
+                    # debug = self._world.debug
+                    # debug.draw_line(lft_lane_wp + carla.Location(z=1), rgt_lane_wp + carla.Location(z=1))
+                    # debug.draw_line(tail_close_pt + carla.Location(z=1), tail_far_pt + carla.Location(z=1), color=carla.Color(0, 0, 255))
                     if self.is_vehicle_crossing_line((tail_close_pt, tail_far_pt), (lft_lane_wp, rgt_lane_wp)):
 
                         self.test_status = "FAILURE"

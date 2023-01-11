@@ -51,5 +51,5 @@ python3 ${LEADERBOARD_ROOT}/leaderboard/leaderboard_evaluator.py \
 --trafficManagerSeed=200 \
 --percentSpeedLimit=$4 \
 --numberOfDrivers=$5 \
---numberOfWalkers=$6 \
---routeScenario=RouteScenario_106
+--numberOfWalkers=$6
+# --routeScenario=RouteScenario_85
