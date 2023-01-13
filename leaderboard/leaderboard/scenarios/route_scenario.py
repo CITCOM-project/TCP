@@ -182,7 +182,7 @@ class RouteScenario(BasicScenario):
 
 	category = "RouteScenario"
 
-	def __init__(self, world, config, debug_mode=0, criteria_enable=True, ideal_number_of_drivers=None, ideal_number_of_walkers=None):
+	def __init__(self, world, config, debug_mode=0, criteria_enable=True, ideal_number_of_drivers=None, ideal_number_of_walkers=None, ego_vehicle_model="vehicle.lincoln.mkz2017"):
 		"""
 		Setup all relevant parameters and create scenarios along route
 		"""
@@ -195,6 +195,7 @@ class RouteScenario(BasicScenario):
 		self.number_of_drivers = None
 		self.ideal_number_of_drivers = ideal_number_of_drivers
 		self.ideal_number_of_walkers = ideal_number_of_walkers
+		self.ego_vehicle_model = ego_vehicle_model
 
 		self._update_route(world, config, debug_mode>0)
 
@@ -241,6 +242,8 @@ class RouteScenario(BasicScenario):
 
 		# Sample the scenarios to be used for this route instance.
 		self.sampled_scenarios_definitions = self._scenario_sampling(potential_scenarios_definitions)
+		print("=== sampled_scenarios_definitions ===")
+		print(self.sampled_scenarios_definitions)
 
 		# Timeout of scenario in seconds
 		self.timeout = self._estimate_route_timeout()
@@ -258,9 +261,7 @@ class RouteScenario(BasicScenario):
 		elevate_transform.location.z += 0.5
 
 		ego_vehicle = CarlaDataProvider.request_new_actor(
-														  'vehicle.bmw.isetta',
-														  #'vehicle.seat.leon',
-														  # 'vehicle.lincoln.mkz2017',
+														  self.ego_vehicle_model,
 														  elevate_transform,
 														  rolename='hero')
 
@@ -426,7 +427,7 @@ class RouteScenario(BasicScenario):
 			scenario_configuration.other_actors = list_of_actor_conf_instances
 			scenario_configuration.trigger_points = [egoactor_trigger_position]
 			scenario_configuration.subtype = definition['scenario_type']
-			scenario_configuration.ego_vehicles = [ActorConfigurationData('vehicle.lincoln.mkz2017',
+			scenario_configuration.ego_vehicles = [ActorConfigurationData(self.ego_vehicle_model,
 																		  ego_vehicle.get_transform(),
 																		  'hero')]
 			route_var_name = "ScenarioRouteNumber{}".format(scenario_number)

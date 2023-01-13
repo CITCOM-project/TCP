@@ -114,7 +114,7 @@ class RouteParser(object):
             for weather_attrib in route.iter("weather"):
 
                 if 'cloudiness' in weather_attrib.attrib:
-                    weather.cloudiness = float(weather_attrib.attrib['cloudiness']) 
+                    weather.cloudiness = float(weather_attrib.attrib['cloudiness'])
                 if 'precipitation' in weather_attrib.attrib:
                     weather.precipitation = float(weather_attrib.attrib['precipitation'])
                 if 'precipitation_deposits' in weather_attrib.attrib:

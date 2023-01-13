@@ -21,7 +21,7 @@ export DATA_COLLECTION=False
 # Roach data collection
 export ROUTES=$1
 export SCENARIOS=$2
-export SAVE_PATH=$3
+export SAVE_PATH="$3/$4_$5_$6_$7"
 # export ROUTES=leaderboard/data/CITCoM_routes/routes_town01.xml
 # export SCENARIOS=leaderboard/data/CITCoM_scenarios/all_towns_traffic_scenarios.json
 # export SAVE_PATH=data/CITCoM_data_collect_town01_results/
@@ -51,5 +51,6 @@ python3 ${LEADERBOARD_ROOT}/leaderboard/leaderboard_evaluator.py \
 --trafficManagerSeed=200 \
 --percentSpeedLimit=$4 \
 --numberOfDrivers=$5 \
---numberOfWalkers=$6
-# --routeScenario=RouteScenario_85
+--numberOfWalkers=$6 \
+--egoVehicle=$7 \
+--routeScenario=2

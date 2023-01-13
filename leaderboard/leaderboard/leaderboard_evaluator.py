@@ -38,6 +38,8 @@ from leaderboard.autoagents.agent_wrapper import  AgentWrapper, AgentError
 from leaderboard.utils.statistics_manager import StatisticsManager
 from leaderboard.utils.route_indexer import RouteIndexer
 
+import random
+
 
 sensors_to_icons = {
     'sensor.camera.rgb':        'carla_camera',
@@ -104,9 +106,6 @@ class LeaderboardEvaluator(object):
         self.sensors = None
         self.sensor_icons = []
         self._vehicle_lights = carla.VehicleLightState.Position | carla.VehicleLightState.LowBeam
-        self.percentage_speed_limit = args.percentSpeedLimit
-        self.ideal_number_of_drivers = args.numberOfDrivers
-        self.ideal_number_of_walkers = args.numberOfWalkers
 
         # First of all, we need to create the client that will send the requests
         # to the simulator. Here we'll assume the simulator is accepting
@@ -122,6 +121,12 @@ class LeaderboardEvaluator(object):
         except Exception as e:
             print(e)
         dist = pkg_resources.get_distribution("carla")
+
+        random.seed(int(args.trafficManagerSeed))
+        self.percentage_speed_limit = random.randint(50, 110) #args.percentSpeedLimit
+        # self.ideal_number_of_drivers = args.numberOfDrivers
+        # self.ideal_number_of_walkers = args.numberOfWalkers
+
         # if dist.version != 'leaderboard':
         #     if LooseVersion(dist.version) < LooseVersion('0.9.10'):
         #         raise ImportError("CARLA version 0.9.10.1 or newer required. CARLA version found: {}".format(dist))
@@ -362,7 +367,8 @@ class LeaderboardEvaluator(object):
         try:
             self._load_and_wait_for_world(args, config.town, config.ego_vehicles)
             self._prepare_ego_vehicles(config.ego_vehicles, False)
-            scenario = RouteScenario(world=self.world, config=config, debug_mode=args.debug, ideal_number_of_drivers=self.ideal_number_of_drivers, ideal_number_of_walkers=self.ideal_number_of_walkers)
+            # scenario = RouteScenario(world=self.world, config=config, debug_mode=args.debug, ideal_number_of_drivers=self.ideal_number_of_drivers, ideal_number_of_walkers=self.ideal_number_of_walkers, ego_vehicle_model=args.egoVehicle)
+            scenario = RouteScenario(world=self.world, config=config, debug_mode=args.debug, ideal_number_of_drivers=random.randint(80, 200), ideal_number_of_walkers=random.randint(80, 200), ego_vehicle_model=args.egoVehicle)
             self.statistics_manager.set_scenario(scenario.scenario)
             scenario.scenario.number_of_drivers = len(scenario.drivers)
 
@@ -382,7 +388,7 @@ class LeaderboardEvaluator(object):
                 self.client.start_recorder("{}/{}_rep{}.log".format(args.record, config.name, config.repetition_index))
             self.manager.load_scenario(scenario, self.agent_instance, config.repetition_index)
 
-            for d in scenario.ego_vehicles:
+            for d in scenario.drivers:
                 self.traffic_manager.vehicle_percentage_speed_difference(d, 100 - args.percentSpeedLimit)
 
         except Exception as e:
@@ -459,7 +465,7 @@ class LeaderboardEvaluator(object):
         # agent_class_name = getattr(self.module_agent, 'get_entry_point')()
         # self.agent_instance = getattr(self.module_agent, agent_class_name)(args.agent_config)
 
-        route_indexer = RouteIndexer(args.routes, args.scenarios, args.repetitions)
+        route_indexer = RouteIndexer(args.routes, args.scenarios, args.repetitions, single_index=args.routeScenario)
 
         if args.resume:
             route_indexer.resume(args.checkpoint)
@@ -472,8 +478,8 @@ class LeaderboardEvaluator(object):
             # setup
             config = route_indexer.next()
 
-            if args.routeScenario is not None and config.name != args.routeScenario:
-                continue
+            # if args.routeScenario is not None and config.name != args.routeScenario:
+                # continue
 
             # run
             self._load_and_run_scenario(args, config)
@@ -556,6 +562,10 @@ def main():
                         type=str,
                         default=None,
                         help='A specific scenario to run.')
+    parser.add_argument('--egoVehicle',
+                        type=str,
+                        default='vehicle.lincoln.mkz2017',
+                        help='The make and model of the ego vehicle.')
     arguments = parser.parse_args()
     print("init statistics_manager")
     statistics_manager = StatisticsManager()
