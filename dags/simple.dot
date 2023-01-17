@@ -9,6 +9,7 @@ digraph simple {
   sun_azimuth_angle [type="input", datatype=float];
   wind_intensity [type="input", datatype=float];
   percentage_speed_limit [type="input", datatype=float];
+  ego_vehicle [type="input", datatype=Car];
 
   /* OUTPUTS */
   collisions_layout [type="output", datatype=int];
@@ -20,6 +21,12 @@ digraph simple {
   score_route [type="output", datatype=score_route];
   stop_infraction [type="output", datatype=int];
   total_steps [type="output", datatype=int];
+
+  ego_vehicle -> collisions_layout;
+  ego_vehicle -> collisions_pedestrian;
+  ego_vehicle -> collisions_vehicle;
+  ego_vehicle -> red_light;
+  ego_vehicle -> stop_infraction;
 
   cloudiness -> collisions_layout;
   cloudiness -> collisions_pedestrian;

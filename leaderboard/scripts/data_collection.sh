@@ -48,9 +48,9 @@ python3 ${LEADERBOARD_ROOT}/leaderboard/leaderboard_evaluator.py \
 --resume=${RESUME} \
 --port=${PORT} \
 --trafficManagerPort=${TM_PORT} \
---trafficManagerSeed=200 \
+--trafficManagerSeed=$6 \
 --percentSpeedLimit=$4 \
 --numberOfDrivers=$5 \
 --numberOfWalkers=$6 \
---egoVehicle=$7 \
---routeScenario=2
+--egoVehicle=$7
+# --routeScenario=2

@@ -46,6 +46,14 @@
       "estimator": "LinearRegressionEstimator",
       "estimate_type": "ate",
       "expectedEffect": {"collisions_vehicle": "NoEffect"},
+      "skip": true
+    },
+    {
+      "name": "ego_vehicle_collisions_vehicle",
+      "mutations": {"ego_vehicle": "Swap"},
+      "estimator": "LinearRegressionEstimator",
+      "estimate_type": "ate",
+      "expectedEffect": {"collisions_vehicle": "NoEffect"},
       "skip": false
     }
   ]

@@ -10,6 +10,24 @@ from causal_testing.testing.estimators import Estimator
 from causal_testing.specification.scenario import Scenario
 from causal_testing.specification.variable import Input, Output
 
+Status = Enum('Status', ['Completed', 'Failed', 'Failed - Agent timed out'])
+
+# class Car(Enum):
+#     isetta = 'vehicle.bmw.isetta'
+#     mkz2017 = 'vehicle.lincoln.mkz2017'
+#
+#     def __gt__(self, other):
+#         self.value > other.value
+Car = Enum('Car', ['vehicle.bmw.isetta', 'vehicle.lincoln.mkz2017'])
+
+
+class CarGen(scipy.stats.rv_discrete):
+    cars = dict(enumerate(Car))
+
+    def ppf(self, q, *args, **kwds):
+        return np.vectorize(self.cars.get)(
+            np.floor(len(self.cars) * q)
+        )
 
 inputs = [
     {"name": "percentage_speed_limit", "type": float, "distribution": scipy.stats.uniform(0, 100)},
@@ -24,11 +42,9 @@ inputs = [
     {"name": "sun_altitude_angle", "type": float, "distribution": scipy.stats.uniform(0, 180)},
     {"name": "sun_azimuth_angle", "type": float, "distribution": scipy.stats.uniform(0, 180)},
     {"name": "wetness", "type": float, "distribution": scipy.stats.uniform(0, 100)},
-    {"name": "wind_intensity", "type": float, "distribution": scipy.stats.uniform(0, 1)}
+    {"name": "wind_intensity", "type": float, "distribution": scipy.stats.uniform(0, 1)},
+    {"name": "ego_vehicle", "type": Car, "distribution": CarGen()}
 ]
-
-
-Status = Enum('Status', ['Completed', 'Failed', 'Failed - Agent timed out'])
 
 outputs = [
     {"name": "collisions_layout", "type": int},
@@ -70,6 +86,8 @@ print(modelling_scenario.variables)
 
 mutates = {
     "Increase": lambda x: modelling_scenario.treatment_variables[x].z3 >
+                          modelling_scenario.variables[x].z3,
+    "Swap": lambda x: modelling_scenario.treatment_variables[x].z3 !=
                           modelling_scenario.variables[x].z3,
     "Plus5": lambda x: modelling_scenario.treatment_variables[x].z3 ==
                           modelling_scenario.variables[x].z3 + 5,
