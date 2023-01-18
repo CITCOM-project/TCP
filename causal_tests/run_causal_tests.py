@@ -12,22 +12,34 @@ from causal_testing.specification.variable import Input, Output
 
 Status = Enum('Status', ['Completed', 'Failed', 'Failed - Agent timed out'])
 
-# class Car(Enum):
-#     isetta = 'vehicle.bmw.isetta'
-#     mkz2017 = 'vehicle.lincoln.mkz2017'
-#
-#     def __gt__(self, other):
-#         self.value > other.value
-Car = Enum('Car', ['vehicle.bmw.isetta', 'vehicle.lincoln.mkz2017'])
+class Car(Enum):
+    isetta = 'vehicle.bmw.isetta'
+    mkz2017 = 'vehicle.lincoln.mkz2017'
+
+    def __gt__(self, other):
+         if self.__class__ is other.__class__:
+           return self.value > other.value
+         return NotImplemented
+# Car = Enum('Car', ['vehicle.bmw.isetta', 'vehicle.lincoln.mkz2017'])
 
 
 class CarGen(scipy.stats.rv_discrete):
-    cars = dict(enumerate(Car))
+    cars = dict(enumerate(Car, 1))
+    inverse_cars = {v:k for k, v in cars.items()}
 
     def ppf(self, q, *args, **kwds):
         return np.vectorize(self.cars.get)(
-            np.floor(len(self.cars) * q)
+            np.ceil(len(self.cars) * q)
         )
+
+    def cdf(self, q, *args, **kwds):
+        return np.vectorize(self.inverse_cars.get)(q)/len(Car)
+        # print("cdf", q, q.__class__)
+        # if q.__class__ is Car:
+        #     q = self.inverse_cars[q]
+        # return q/len(Car)
+
+cardist = CarGen()
 
 inputs = [
     {"name": "percentage_speed_limit", "type": float, "distribution": scipy.stats.uniform(0, 100)},
