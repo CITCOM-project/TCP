@@ -2,9 +2,12 @@ import numpy as np
 import pandas as pd
 import scipy
 from enum import Enum
+from typing import Any
+from z3 import And
 
+from causal_testing.specification.variable import Variable
 from causal_testing.testing.estimators import LinearRegressionEstimator, LogisticRegressionEstimator
-from causal_testing.testing.causal_test_outcome import SomeEffect, NoEffect
+from causal_testing.testing.causal_test_outcome import SomeEffect, NoEffect, Negative
 from causal_testing.json_front.json_class import JsonUtility
 from causal_testing.testing.estimators import Estimator
 from causal_testing.specification.scenario import Scenario
@@ -59,13 +62,15 @@ inputs = [
 ]
 
 outputs = [
-    {"name": "collisions_layout", "type": int},
-    # {"name": "collisions_pedestrian", "type": int},
-    {"name": "collisions_vehicle", "type": int},
-    {"name": "red_light", "type": int},
+    {"name": "collisions_layout", "type": bool},
+    # {"name": "collisions_pedestrian", "type": bool},
+    {"name": "collisions_vehicle", "type": bool},
+    {"name": "red_light", "type": bool, "distribution": scipy.stats.rv_discrete(name="red_light", values=(range(0, 2), [1/2]*2))},
+    {"name": "vehicle_blocked", "type": bool, "distribution": scipy.stats.rv_discrete(name="vehicle_blocked", values=(range(0, 2), [1/2]*2))},
     {"name": "route_length", "type": float},
-    {"name": "route_timeout", "type": float},
+    {"name": "route_timeout", "type": bool},
     {"name": "score_route", "type": float},
+    {"name": "score_composed", "type": float},
     # {"name": "status", "type": Status},
     # {"name": "stop_infraction", "type": int},
     {"name": "total_steps", "type": int}
@@ -74,12 +79,8 @@ outputs = [
 
 effects = {
     "NoEffect": NoEffect(),
-    "SomeEffect": SomeEffect()
-}
-
-estimators = {
-    "LinearRegressionEstimator": LinearRegressionEstimator,
-    "LogisticRegressionEstimator": LogisticRegressionEstimator
+    "SomeEffect": SomeEffect(),
+    "Negative": Negative()
 }
 
 # Create input structure required to create a modelling scenario
@@ -96,9 +97,37 @@ modelling_scenario = Scenario(variables, constraints)
 modelling_scenario.setup_treatment_variables()
 print(modelling_scenario.variables)
 
+class ScoreComposedEstimator(LinearRegressionEstimator):
+    def __init__(
+        self,
+        treatment: tuple,
+        treatment_values: float,
+        control_values: float,
+        adjustment_set: list[float],
+        outcome: tuple,
+        df: pd.DataFrame = None,
+        effect_modifiers: dict[Variable:Any] = None,
+        product_terms: list[tuple[Variable, Variable]] = None,
+        intercept: int = 1,
+    ):
+        super().__init__(treatment=treatment,treatment_values=treatment_values,
+        control_values=control_values,adjustment_set=adjustment_set,outcome=outcome, df=df,
+        )
+        self.add_product_term_to_df('score_route', 'red_light')
+        self.add_product_term_to_df('score_route', 'collisions_vehicle')
+        self.add_product_term_to_df('score_route', 'collisions_layout')
+        # self.add_product_term_to_df('score_route', 'vehicle_blocked') # This shouldn't have a causal effect
+
+estimators = {
+    "LinearRegressionEstimator": LinearRegressionEstimator,
+    "LogisticRegressionEstimator": LogisticRegressionEstimator,
+    "ScoreComposedEstimator": ScoreComposedEstimator
+}
+
 mutates = {
     "Increase": lambda x: modelling_scenario.treatment_variables[x].z3 >
                           modelling_scenario.variables[x].z3,
+    "GoThrough": lambda x: And(modelling_scenario.treatment_variables[x].z3 == True, modelling_scenario.variables[x].z3 == False ),
     "Swap": lambda x: modelling_scenario.treatment_variables[x].z3 !=
                           modelling_scenario.variables[x].z3,
     "Plus5": lambda x: modelling_scenario.treatment_variables[x].z3 ==

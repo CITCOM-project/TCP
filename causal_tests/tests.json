@@ -51,10 +51,35 @@
     {
       "name": "ego_vehicle_collisions_vehicle",
       "mutations": {"ego_vehicle": "Swap"},
-      "estimator": "LinearRegressionEstimator",
+      "estimator": "LogisticRegressionEstimator",
       "estimate_type": "ate",
       "expectedEffect": {"collisions_vehicle": "NoEffect"},
+      "skip": true
+    },
+    {
+      "name": "number_of_drivers_collisions_vehicle",
+      "mutations": {"number_of_drivers": "Plus20"},
+      "estimator": "LogisticRegressionEstimator",
+      "estimate_type": "ate",
+      "expectedEffect": {"collisions_vehicle": "NoEffect"},
+      "skip": true
+    },
+    {
+      "name": "number_of_drivers_route_timeout",
+      "mutations": {"number_of_drivers": "Plus20"},
+      "estimator": "LogisticRegressionEstimator",
+      "estimate_type": "ate",
+      "expectedEffect": {"route_timeout": "NoEffect"},
+      "skip": true
+    },
+    {
+      "name": "red_light_score_route",
+      "mutations": {"red_light": "Swap"},
+      "estimator": "LinearRegressionEstimator",
+      "estimate_type": "ate",
+      "expectedEffect": {"route_timeout": "SomeEffect"},
       "skip": false
     }
+
   ]
 }

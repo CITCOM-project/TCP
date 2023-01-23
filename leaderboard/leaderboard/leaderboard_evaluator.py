@@ -123,7 +123,8 @@ class LeaderboardEvaluator(object):
         dist = pkg_resources.get_distribution("carla")
 
         random.seed(int(args.trafficManagerSeed))
-        self.percentage_speed_limit = random.randint(50, 110) #args.percentSpeedLimit
+        self.percentage_speed_limit = None
+        # self.percentage_speed_limit = random.randint(50, 110) #args.percentSpeedLimit
         # self.ideal_number_of_drivers = args.numberOfDrivers
         # self.ideal_number_of_walkers = args.numberOfWalkers
 
@@ -365,6 +366,7 @@ class LeaderboardEvaluator(object):
 
         # Load the world and the scenario
         try:
+            self.percentage_speed_limit = random.randint(50, 110) #Need to initialise this here for each loop round otherwise we get the same one for each run
             self._load_and_wait_for_world(args, config.town, config.ego_vehicles)
             self._prepare_ego_vehicles(config.ego_vehicles, False)
             # scenario = RouteScenario(world=self.world, config=config, debug_mode=args.debug, ideal_number_of_drivers=self.ideal_number_of_drivers, ideal_number_of_walkers=self.ideal_number_of_walkers, ego_vehicle_model=args.egoVehicle)
