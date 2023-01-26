@@ -4,16 +4,30 @@ import scipy
 from enum import Enum
 from typing import Any
 from z3 import And
+import statsmodels.api as sm
 
 from causal_testing.specification.variable import Variable
 from causal_testing.testing.estimators import LinearRegressionEstimator, LogisticRegressionEstimator
-from causal_testing.testing.causal_test_outcome import SomeEffect, NoEffect, Negative
+from causal_testing.testing.causal_test_outcome import SomeEffect, NoEffect, Negative, ExactValue
 from causal_testing.json_front.json_class import JsonUtility
 from causal_testing.testing.estimators import Estimator
 from causal_testing.specification.scenario import Scenario
 from causal_testing.specification.variable import Input, Output
 
 Status = Enum('Status', ['Completed', 'Failed', 'Failed - Agent timed out'])
+
+class InfractionsEstimator(Estimator):
+    def add_modelling_assumptions(self):
+        self.modelling_assumptions += (
+            "The variables in the data must fit a shape which can be expressed as a linear"
+            "combination of parameters and functions of variables. Note that these functions"
+            "do not need to be linear."
+        )
+
+    def estimate_ate(self):
+        stratum = self.df.where(self.df['infraction'] == self.effect_modifiers["infraction"]).dropna()
+        model = sm.OLS(stratum['score_composed'], stratum[["score_route"]]).fit()
+        return model.params['score_route'], sorted(model.conf_int(alpha=0.05, cols=None).loc['score_route'])
 
 class Car(Enum):
     isetta = 'vehicle.bmw.isetta'
@@ -88,7 +102,11 @@ outputs = [
 effects = {
     "NoEffect": NoEffect(),
     "SomeEffect": SomeEffect(),
-    "Negative": Negative()
+    "Negative": Negative(),
+    "1.0": ExactValue(1),
+    "0.7": ExactValue(0.7),
+    "0.65": ExactValue(0.65),
+    "0.6": ExactValue(0.6)
 }
 
 # Create input structure required to create a modelling scenario
@@ -129,7 +147,8 @@ class ScoreComposedEstimator(LinearRegressionEstimator):
 estimators = {
     "LinearRegressionEstimator": LinearRegressionEstimator,
     "LogisticRegressionEstimator": LogisticRegressionEstimator,
-    "ScoreComposedEstimator": ScoreComposedEstimator
+    "ScoreComposedEstimator": ScoreComposedEstimator,
+    "InfractionsEstimator": InfractionsEstimator
 }
 
 mutates = {
@@ -138,6 +157,8 @@ mutates = {
     "GoThrough": lambda x: And(modelling_scenario.treatment_variables[x].z3 == True, modelling_scenario.variables[x].z3 == False ),
     "Swap": lambda x: modelling_scenario.treatment_variables[x].z3 !=
                           modelling_scenario.variables[x].z3,
+    "Plus1": lambda x: modelling_scenario.treatment_variables[x].z3 ==
+                          modelling_scenario.variables[x].z3 + 1,
     "Plus5": lambda x: modelling_scenario.treatment_variables[x].z3 ==
                           modelling_scenario.variables[x].z3 + 5,
     "Plus10": lambda x: modelling_scenario.treatment_variables[x].z3 ==
