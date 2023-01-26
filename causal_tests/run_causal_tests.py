@@ -23,26 +23,33 @@ class Car(Enum):
          if self.__class__ is other.__class__:
            return self.value > other.value
          return NotImplemented
-# Car = Enum('Car', ['vehicle.bmw.isetta', 'vehicle.lincoln.mkz2017'])
 
 
-class CarGen(scipy.stats.rv_discrete):
-    cars = dict(enumerate(Car, 1))
-    inverse_cars = {v:k for k, v in cars.items()}
+class EnumGen(scipy.stats.rv_discrete):
+    def __init__(self, dt: Enum):
+        self.dt = dict(enumerate(dt, 1))
+        self.inverse_dt = {v:k for k, v in self.dt.items()}
 
     def ppf(self, q, *args, **kwds):
-        return np.vectorize(self.cars.get)(
-            np.ceil(len(self.cars) * q)
+        return np.vectorize(self.dt.get)(
+            np.ceil(len(self.dt) * q)
         )
 
     def cdf(self, q, *args, **kwds):
-        return np.vectorize(self.inverse_cars.get)(q)/len(Car)
-        # print("cdf", q, q.__class__)
-        # if q.__class__ is Car:
-        #     q = self.inverse_cars[q]
-        # return q/len(Car)
+        return np.vectorize(self.inverse_dt.get)(q)/len(Car)
 
-cardist = CarGen()
+
+class Infraction(Enum):
+    red_light = 'red_light'
+    # collisions_pedestrian = 'collisions_pedestrian'
+    collisions_vehicle = 'collisions_vehicle'
+    collisions_layout = 'collisions_layout'
+    false = 'False'
+
+    def __gt__(self, other):
+         if self.__class__ is other.__class__:
+           return self.value > other.value
+         return NotImplemented
 
 inputs = [
     {"name": "percentage_speed_limit", "type": float, "distribution": scipy.stats.uniform(0, 100)},
@@ -58,7 +65,7 @@ inputs = [
     {"name": "sun_azimuth_angle", "type": float, "distribution": scipy.stats.uniform(0, 180)},
     {"name": "wetness", "type": float, "distribution": scipy.stats.uniform(0, 100)},
     {"name": "wind_intensity", "type": float, "distribution": scipy.stats.uniform(0, 1)},
-    {"name": "ego_vehicle", "type": Car, "distribution": CarGen()}
+    {"name": "ego_vehicle", "type": Car, "distribution": EnumGen(Car)}
 ]
 
 outputs = [
@@ -73,7 +80,8 @@ outputs = [
     {"name": "score_composed", "type": float},
     # {"name": "status", "type": Status},
     # {"name": "stop_infraction", "type": int},
-    {"name": "total_steps", "type": int}
+    {"name": "total_steps", "type": int},
+    {"name": "infraction", "type": Infraction, "distribution": EnumGen(Infraction)}
 ]
 
 

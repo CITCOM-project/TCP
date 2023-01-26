@@ -1,0 +1,14 @@
+{
+    "tests": [
+      {
+        "name": "red_light_score_composed",
+        "mutations": {"score_route": "Plus20"},
+        "estimator": "LinearRegressionEstimator",
+        "estimate_type": "cate",
+        "effect": "direct",
+        "expectedEffect": {"score_composed": "NoEffect"},
+        "effect_modifiers": {"infraction": "red_light"},
+        "skip": false
+      }
+  ]
+}
