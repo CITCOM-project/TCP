@@ -13,14 +13,19 @@ import sys
 
 # RESULTS_FILE = "data/CITCoM_data_collect_town01_results/data_collect_town01_results.json"
 RESULTS_FILE = sys.argv[1]
+BASENAME = RESULTS_FILE.split("/")[-2]
 
 collision_re = re.compile(r"Agent with velocity (\d+\.\d+((e-?\d+)?)) collided against object with type=\w+\.[\w-]+\.\w+ and id=\d+ and velocity (\d+\.\d+((e-?\d+)?)) at")
+collision_re_inferfuser = re.compile(r"Agent collided against object with type=\w+\.[\w-]+\.\w+ and id=\d+ at")
 
 
 def get_velocity(collision):
     match = collision_re.match(collision)
+    if match:
+        return float(match.group(1)), float(match.group(4))
+    match = collision_re_inferfuser.match(collision)
     assert match is not None, f"COULD NOT MATCH '{collision}'"
-    return float(match.group(1)), float(match.group(4))
+    return None, None
 
 routes = {}
 
@@ -28,6 +33,7 @@ with open(RESULTS_FILE) as f:
     results = json.load(f)
 
 for route in results['_checkpoint']['records']:
+    route['basename'] = BASENAME
     if "weather" not in route:
         continue
     index = int(route.pop("index"))
@@ -45,7 +51,8 @@ for route in results['_checkpoint']['records']:
         route[score] = route['scores'][score]
     route.pop('weather')
     route.pop('infractions')
-    route.pop('friction')
+    if "friction" in route:
+        route.pop('friction')
     route.pop('meta')
     route.pop('scores')
     routes[index] = route
