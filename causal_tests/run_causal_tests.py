@@ -7,8 +7,8 @@ from z3 import And
 import statsmodels.api as sm
 
 from causal_testing.specification.variable import Variable
-from causal_testing.testing.estimators import LinearRegressionEstimator, LogisticRegressionEstimator
-from causal_testing.testing.causal_test_outcome import SomeEffect, NoEffect, Negative, ExactValue
+from causal_testing.testing.estimators import LinearRegressionEstimator, LogisticRegressionEstimator, InstrumentalVariableEstimator
+from causal_testing.testing.causal_test_outcome import SomeEffect, NoEffect, Negative, ExactValue, Positive
 from causal_testing.json_front.json_class import JsonUtility
 from causal_testing.testing.estimators import Estimator
 from causal_testing.specification.scenario import Scenario
@@ -92,6 +92,8 @@ outputs = [
     {"name": "route_timeout", "type": bool},
     {"name": "score_route", "type": float},
     {"name": "score_composed", "type": float},
+    {"name": "duration_game", "type": float},
+    {"name": "duration_system", "type": float},
     # {"name": "status", "type": Status},
     # {"name": "stop_infraction", "type": int},
     {"name": "total_steps", "type": int},
@@ -103,6 +105,7 @@ effects = {
     "NoEffect": NoEffect(),
     "SomeEffect": SomeEffect(),
     "Negative": Negative(),
+    "Positive": Positive(),
     "1.0": ExactValue(1),
     "0.7": ExactValue(0.7),
     "0.65": ExactValue(0.65),
@@ -144,11 +147,15 @@ class ScoreComposedEstimator(LinearRegressionEstimator):
         self.add_product_term_to_df('score_route', 'collisions_layout')
         # self.add_product_term_to_df('score_route', 'vehicle_blocked') # This shouldn't have a causal effect
 
+def iv_estimator(**kwargs):
+    return InstrumentalVariableEstimator(**kwargs, instrument="cloudiness")
+
 estimators = {
     "LinearRegressionEstimator": LinearRegressionEstimator,
     "LogisticRegressionEstimator": LogisticRegressionEstimator,
     "ScoreComposedEstimator": ScoreComposedEstimator,
-    "InfractionsEstimator": InfractionsEstimator
+    "InfractionsEstimator": InfractionsEstimator,
+    "InstrumentalVariableEstimator": iv_estimator
 }
 
 mutates = {
