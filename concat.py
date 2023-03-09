@@ -8,8 +8,10 @@ Created on Thu Dec 22 09:57:58 2022
 import pandas as pd
 import glob
 
-csvs = glob.glob("data/*/*.csv")
+csvs = glob.glob("new_data/*/*/*/*.csv")
 
 data = pd.concat([pd.read_csv(csv, index_col=0) for csv in csvs])
 
-data.to_csv("data/big_data.csv")
+data.to_csv("new_data/big_data.csv")
+
+print(len(data), "data points")

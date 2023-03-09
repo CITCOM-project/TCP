@@ -15,23 +15,16 @@ export TM_PORT=8000
 export DEBUG_CHALLENGE=0
 export REPETITIONS=1 # multiple evaluation runs
 export RESUME=True
-export DATA_COLLECTION=False
+export DATA_COLLECTION=True
 
 
 # Roach data collection
-export ROUTES=$1
-export SCENARIOS=$2
-export SAVE_PATH="$3/$4_$5_$6_$7"
-# export ROUTES=leaderboard/data/CITCoM_routes/routes_town01.xml
-# export SCENARIOS=leaderboard/data/CITCoM_scenarios/all_towns_traffic_scenarios.json
-# export SAVE_PATH=data/CITCoM_data_collect_town01_results/
-# export ROUTES=leaderboard/data/TCP_training_routes/routes_town01_weather_20.xml
-# export SCENARIOS=leaderboard/data/scenarios/all_towns_traffic_scenarios.json
-# export SAVE_PATH=data/data_collect_town01_results_weather_20/
-
+export ROUTES=leaderboard/data/training_routes/weather_routes_town01_short.xml
 export TEAM_AGENT=team_code/roach_ap_agent.py
 export TEAM_CONFIG=roach/config/config_agent.yaml
-export CHECKPOINT_ENDPOINT=$SAVE_PATH/data_collect_town01_results.json
+export CHECKPOINT_ENDPOINT=data/data_interfuser_town01_results/results.json
+export SCENARIOS=leaderboard/data/scenarios/all_towns_traffic_scenarios.json
+export SAVE_PATH=data/data_interfuser_town01_results/routes/
 
 
 
@@ -47,10 +40,6 @@ python3 ${LEADERBOARD_ROOT}/leaderboard/leaderboard_evaluator.py \
 --record=${RECORD_PATH} \
 --resume=${RESUME} \
 --port=${PORT} \
---trafficManagerPort=${TM_PORT} \
---trafficManagerSeed=$6 \
---percentSpeedLimit=$4 \
---numberOfDrivers=$5 \
---numberOfWalkers=$6 \
---egoVehicle=$7
-# --routeScenario=2
+--trafficManagerPort=${TM_PORT}
+
+

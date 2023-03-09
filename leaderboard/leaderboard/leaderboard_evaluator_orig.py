@@ -38,8 +38,6 @@ from leaderboard.autoagents.agent_wrapper import  AgentWrapper, AgentError
 from leaderboard.utils.statistics_manager import StatisticsManager
 from leaderboard.utils.route_indexer import RouteIndexer
 
-import random
-
 
 sensors_to_icons = {
     'sensor.camera.rgb':        'carla_camera',
@@ -91,12 +89,6 @@ class LeaderboardEvaluator(object):
     wait_for_world = 20.0  # in seconds
     frame_rate = 20.0      # in Hz
 
-    def count_actors(self):
-        counts = {}
-        for a in self.world.get_actors():
-            counts[a.type_id] = counts.get(a.type_id, 0) + 1
-        return counts
-
     def __init__(self, args, statistics_manager):
         """
         Setup CARLA client and world
@@ -121,13 +113,6 @@ class LeaderboardEvaluator(object):
         except Exception as e:
             print(e)
         dist = pkg_resources.get_distribution("carla")
-
-        random.seed(int(args.trafficManagerSeed))
-        self.percentage_speed_limit = None
-        # self.percentage_speed_limit = random.randint(50, 110) #args.percentSpeedLimit
-        # self.ideal_number_of_drivers = args.numberOfDrivers
-        # self.ideal_number_of_walkers = args.numberOfWalkers
-
         # if dist.version != 'leaderboard':
         #     if LooseVersion(dist.version) < LooseVersion('0.9.10'):
         #         raise ImportError("CARLA version 0.9.10.1 or newer required. CARLA version found: {}".format(dist))
@@ -194,8 +179,8 @@ class LeaderboardEvaluator(object):
                 self.ego_vehicles[i] = None
         self.ego_vehicles = []
 
-        # if self._agent_watchdog:
-        #     self._agent_watchdog.stop()
+        if self._agent_watchdog:
+            self._agent_watchdog.stop()
 
         if hasattr(self, 'agent_instance') and self.agent_instance:
             self.agent_instance.destroy()
@@ -250,7 +235,7 @@ class LeaderboardEvaluator(object):
         #     settings.synchronous_mode = False
         #     self.world.apply_settings(settings)
         print(town)
-        try:
+        try: 
             self.world = self.client.load_world(town)
         except Exception as e:
             print(e)
@@ -278,11 +263,9 @@ class LeaderboardEvaluator(object):
         else:
             self.world.wait_for_tick()
 
-
         if CarlaDataProvider.get_map().name != town:
             raise Exception("The CARLA server uses the wrong map!"
                             "This scenario requires to use map {}".format(town))
-        print("loaded_world", self.count_actors())
 
     def _register_statistics(self, config, checkpoint, entry_status, crash_message=""):
         """
@@ -291,11 +274,9 @@ class LeaderboardEvaluator(object):
         # register statistics
         current_stats_record = self.statistics_manager.compute_route_statistics(
             config,
-            percentage_speed_limit=self.percentage_speed_limit,
-            duration_time_system=self.manager.scenario_duration_system,
-            duration_time_game=self.manager.scenario_duration_game,
-            ego_vehicle=self.ego_vehicle.type_id,
-            failure=crash_message
+            self.manager.scenario_duration_system,
+            self.manager.scenario_duration_game,
+            crash_message
         )
 
         print("\033[1m> Registering the route statistics\033[0m")
@@ -366,16 +347,10 @@ class LeaderboardEvaluator(object):
 
         # Load the world and the scenario
         try:
-            self.percentage_speed_limit = random.randint(50, 110) #Need to initialise this here for each loop round otherwise we get the same one for each run
             self._load_and_wait_for_world(args, config.town, config.ego_vehicles)
             self._prepare_ego_vehicles(config.ego_vehicles, False)
-            # scenario = RouteScenario(world=self.world, config=config, debug_mode=args.debug, ideal_number_of_drivers=self.ideal_number_of_drivers, ideal_number_of_walkers=self.ideal_number_of_walkers, ego_vehicle_model=args.egoVehicle)
-            scenario = RouteScenario(world=self.world, config=config, debug_mode=args.debug, ideal_number_of_drivers=random.randint(80, 200), ideal_number_of_walkers=random.randint(80, 200), ego_vehicle_model=args.egoVehicle)
+            scenario = RouteScenario(world=self.world, config=config, debug_mode=args.debug)
             self.statistics_manager.set_scenario(scenario.scenario)
-            scenario.scenario.number_of_drivers = len(scenario.drivers)
-
-            # Hack to get the ego vehicle into the stats manager
-            self.ego_vehicle = scenario.ego_vehicles[0]
 
             # self.agent_instance._init()
             # self.agent_instance.sensor_interface = SensorInterface()
@@ -389,9 +364,6 @@ class LeaderboardEvaluator(object):
             if args.record:
                 self.client.start_recorder("{}/{}_rep{}.log".format(args.record, config.name, config.repetition_index))
             self.manager.load_scenario(scenario, self.agent_instance, config.repetition_index)
-
-            for d in scenario.drivers:
-                self.traffic_manager.vehicle_percentage_speed_difference(d, 100 - args.percentSpeedLimit)
 
         except Exception as e:
             # The scenario is wrong -> set the ejecution to crashed and stop
@@ -435,11 +407,7 @@ class LeaderboardEvaluator(object):
         # Stop the scenario
         try:
             print("\033[1m> Stopping the route\033[0m")
-            scenario.set_number_of_walkers()
-            scenario.count_actors()
             self.manager.stop_scenario()
-            # assert scenario.number_of_walkers is not None, "Scenario number_of_walkers is none"
-            scenario.scenario.number_of_walkers = scenario.number_of_walkers
             self._register_statistics(config, args.checkpoint, entry_status, crash_message)
 
             if args.record:
@@ -467,7 +435,7 @@ class LeaderboardEvaluator(object):
         # agent_class_name = getattr(self.module_agent, 'get_entry_point')()
         # self.agent_instance = getattr(self.module_agent, agent_class_name)(args.agent_config)
 
-        route_indexer = RouteIndexer(args.routes, args.scenarios, args.repetitions, single_index=args.routeScenario)
+        route_indexer = RouteIndexer(args.routes, args.scenarios, args.repetitions)
 
         if args.resume:
             route_indexer.resume(args.checkpoint)
@@ -479,9 +447,6 @@ class LeaderboardEvaluator(object):
         while route_indexer.peek():
             # setup
             config = route_indexer.next()
-
-            # if args.routeScenario is not None and config.name != args.routeScenario:
-                # continue
 
             # run
             self._load_and_run_scenario(args, config)
@@ -545,29 +510,6 @@ def main():
                         default='./simulation_results.json',
                         help="Path to checkpoint used for saving statistics and resuming")
 
-    # NPCs
-    parser.add_argument('-n', '--number-of-vehicles', metavar='N', default=10, type=int, help='number of vehicles (default: 10)')
-    parser.add_argument('-w', '--number-of-walkers', metavar='W', default=50, type=int, help='number of walkers (default: 50)')
-    parser.add_argument('--percentSpeedLimit',
-                        type=int,
-                        default=70,
-                        help='The percentage of the speed limit at which the other vehicles should travel.')
-    parser.add_argument('--numberOfDrivers',
-                        type=int,
-                        default=None,
-                        help='The number of other drivers on the road.')
-    parser.add_argument('--numberOfWalkers',
-                        type=int,
-                        default=None,
-                        help='The number of walkers.')
-    parser.add_argument('--routeScenario',
-                        type=str,
-                        default=None,
-                        help='A specific scenario to run.')
-    parser.add_argument('--egoVehicle',
-                        type=str,
-                        default='vehicle.lincoln.mkz2017',
-                        help='The make and model of the ego vehicle.')
     arguments = parser.parse_args()
     print("init statistics_manager")
     statistics_manager = StatisticsManager()
