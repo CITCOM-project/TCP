@@ -1,5 +1,5 @@
 #!/bin/bash
-export CARLA_ROOT=/home/michael/Documents/CITCoM/carla/CARLA
+export CARLA_ROOT=../CARLA
 export CARLA_SERVER=${CARLA_ROOT}/CarlaUE4.sh
 export PYTHONPATH=$PYTHONPATH:${CARLA_ROOT}/PythonAPI
 export PYTHONPATH=$PYTHONPATH:${CARLA_ROOT}/PythonAPI/carla
@@ -41,5 +41,3 @@ python3 ${LEADERBOARD_ROOT}/leaderboard/leaderboard_evaluator.py \
 --resume=${RESUME} \
 --port=${PORT} \
 --trafficManagerPort=${TM_PORT}
-
-

@@ -3,3 +3,4 @@ data/
 *.png
 *.pdf
 *.log
+!data/*results.json
