@@ -7,12 +7,12 @@ class GlobalConfig:
 	pred_len = 4 # future waypoints predicted
 
 	# data root
-	root_dir_all = "tcp_carla_data"
+	root_dir_all = "data/tcp_carla_data"
 
 	train_towns = ['town01', 'town03', 'town04',  'town06', ]
 	val_towns = ['town02', 'town05', 'town07', 'town10']
 	train_data, val_data = [], []
-	for town in train_towns:		
+	for town in train_towns:
 		train_data.append(os.path.join(root_dir_all, town))
 		train_data.append(os.path.join(root_dir_all, town+'_addition'))
 	for town in val_towns:

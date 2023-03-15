@@ -1,5 +1,5 @@
 #!/bin/bash
-export CARLA_ROOT="home/michael/Documents/CITCoM/carla/CARLA"
+export CARLA_ROOT="../CARLA"
 export CARLA_SERVER=${CARLA_ROOT}/CarlaUE4.sh
 export PYTHONPATH=$PYTHONPATH:${CARLA_ROOT}/PythonAPI
 export PYTHONPATH=$PYTHONPATH:${CARLA_ROOT}/PythonAPI/carla
@@ -20,10 +20,10 @@ export RESUME=True
 # TCP evaluation
 export ROUTES=leaderboard/data/evaluation_routes/routes_lav_valid.xml
 export TEAM_AGENT=team_code/tcp_agent.py
-export TEAM_CONFIG= PATH_TO_MODEL_CKPT
-export CHECKPOINT_ENDPOINT=data/results_TCP.json
+export TEAM_CONFIG="log/TCP/epoch=3-last.ckpt"
 export SCENARIOS=leaderboard/data/scenarios/all_towns_traffic_scenarios.json
 export SAVE_PATH=data/results_TCP/
+export CHECKPOINT_ENDPOINT=${SAVE_PATH}/results_TCP.json
 
 
 python3 ${LEADERBOARD_ROOT}/leaderboard/leaderboard_evaluator.py \
