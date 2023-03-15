@@ -124,9 +124,14 @@ class LeaderboardEvaluator(object):
 
         random.seed(int(args.trafficManagerSeed))
         self.percentage_speed_limit = None
-        # self.percentage_speed_limit = random.randint(50, 110) #args.percentSpeedLimit
-        # self.ideal_number_of_drivers = args.numberOfDrivers
-        # self.ideal_number_of_walkers = args.numberOfWalkers
+        self.ideal_number_of_drivers = None
+        self.ideal_number_of_walkers = None
+
+        if not args.randomise:
+            if args.numberOfDrivers:
+                self.ideal_number_of_drivers = int(args.numberOfDrivers)
+            if args.numberOfWalkers:
+                self.ideal_number_of_walkers = int(args.numberOfWalkers)
 
         # if dist.version != 'leaderboard':
         #     if LooseVersion(dist.version) < LooseVersion('0.9.10'):
@@ -366,11 +371,17 @@ class LeaderboardEvaluator(object):
 
         # Load the world and the scenario
         try:
-            self.percentage_speed_limit = random.randint(50, 110) #Need to initialise this here for each loop round otherwise we get the same one for each run
+            if args.randomise:
+                self.percentage_speed_limit = random.randint(50, 110) #Need to initialise this here for each loop round otherwise we get the same one for each run
+            else:
+                self.percentage_speed_limit = args.percentSpeedLimit
             self._load_and_wait_for_world(args, config.town, config.ego_vehicles)
             self._prepare_ego_vehicles(config.ego_vehicles, False)
-            # scenario = RouteScenario(world=self.world, config=config, debug_mode=args.debug, ideal_number_of_drivers=self.ideal_number_of_drivers, ideal_number_of_walkers=self.ideal_number_of_walkers, ego_vehicle_model=args.egoVehicle)
-            scenario = RouteScenario(world=self.world, config=config, debug_mode=args.debug, ideal_number_of_drivers=random.randint(80, 200), ideal_number_of_walkers=random.randint(80, 200), ego_vehicle_model=args.egoVehicle)
+            if args.randomise:
+                scenario = RouteScenario(world=self.world, config=config, debug_mode=args.debug, ideal_number_of_drivers=random.randint(80, 200), ideal_number_of_walkers=random.randint(80, 200), ego_vehicle_model=args.egoVehicle)
+            else:
+                print(f"scenario = RouteScenario(world={self.world}, config={config}, debug_mode={args.debug}, ideal_number_of_drivers={self.ideal_number_of_drivers}, ideal_number_of_walkers={self.ideal_number_of_walkers}, ego_vehicle_model={args.egoVehicle})")
+                scenario = RouteScenario(world=self.world, config=config, debug_mode=args.debug, ideal_number_of_drivers=self.ideal_number_of_drivers, ideal_number_of_walkers=self.ideal_number_of_walkers, ego_vehicle_model=args.egoVehicle)
             self.statistics_manager.set_scenario(scenario.scenario)
             scenario.scenario.number_of_drivers = len(scenario.drivers)
 
@@ -525,7 +536,7 @@ def main():
                         required=True)
     parser.add_argument('--weather',
                         type=str, default='none',
-                        help='Name of the weahter to be executed',
+                        help='Name of the weather to be executed',
                         )
     parser.add_argument('--scenarios',
                         help='Name of the scenario annotation file to be mixed with the route.',
@@ -546,11 +557,10 @@ def main():
                         help="Path to checkpoint used for saving statistics and resuming")
 
     # NPCs
-    parser.add_argument('-n', '--number-of-vehicles', metavar='N', default=10, type=int, help='number of vehicles (default: 10)')
-    parser.add_argument('-w', '--number-of-walkers', metavar='W', default=50, type=int, help='number of walkers (default: 50)')
     parser.add_argument('--percentSpeedLimit',
                         type=int,
-                        default=70,
+                        default=None,
+                        # default=70,
                         help='The percentage of the speed limit at which the other vehicles should travel.')
     parser.add_argument('--numberOfDrivers',
                         type=int,
@@ -566,11 +576,27 @@ def main():
                         help='A specific scenario to run.')
     parser.add_argument('--egoVehicle',
                         type=str,
-                        default='vehicle.lincoln.mkz2017',
+                        default=None,
+                        # default='vehicle.lincoln.mkz2017',
                         help='The make and model of the ego vehicle.')
+    parser.add_argument('-r', '--randomise',
+                    action='store_true')  # on/off flag
     arguments = parser.parse_args()
     print("init statistics_manager")
     statistics_manager = StatisticsManager()
+
+    if arguments.randomise:
+        assert arguments.percentSpeedLimit is None, "Cannot specify a percentSpeedLimit if randomisation is on."
+        assert arguments.numberOfDrivers is None, "Cannot specify a numberOfDrivers if randomisation is on."
+        assert arguments.numberOfWalkers is None, "Cannot specify a numberOfWalkers if randomisation is on."
+        assert arguments.numberOfWalkers is None, "Cannot specify a numberOfWalkers if randomisation is on."
+        assert arguments.egoVehicle is None, "Cannot specify a egoVehicle if randomisation is on."
+    else:
+        if arguments.egoVehicle is None:
+            arguments.egoVehicle = 'vehicle.lincoln.mkz2017'
+        if arguments.percentSpeedLimit is None:
+            arguments.percentSpeedLimit = 70
+
 
     try:
         print("begin")

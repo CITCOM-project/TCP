@@ -499,20 +499,20 @@ class RouteScenario(BasicScenario):
 		}
 
 		# amount = town_amount[config.town] if config.town in town_amount else 0
-		num_drivers = self.ideal_number_of_drivers if self.ideal_number_of_drivers is not None else town_amount.get(config.town, 0)
-		num_walkers = self.ideal_number_of_walkers if self.ideal_number_of_walkers is not None else town_amount.get(config.town, 0)
+		self.ideal_number_of_drivers = self.ideal_number_of_drivers if self.ideal_number_of_drivers is not None else town_amount.get(config.town, 0)
+		self.ideal_number_of_walkers = self.ideal_number_of_walkers if self.ideal_number_of_walkers is not None else town_amount.get(config.town, 0)
 
-		assert self.ideal_number_of_drivers is not None, "None drivers"
+		# assert self.ideal_number_of_drivers is not None, "None drivers"
 
 		self.walker_thread = CarlaDataProvider.request_new_batch_walkers('walker.*',
-																num_walkers,
+																self.ideal_number_of_walkers,
 																carla.Transform(),
 																autopilot=True,
 																random_location=True,
 																rolename='background')
 
 		new_actors = CarlaDataProvider.request_new_batch_actors('vehicle.*',
-																num_drivers,
+																self.ideal_number_of_drivers,
 																carla.Transform(),
 																autopilot=True,
 																random_location=True,

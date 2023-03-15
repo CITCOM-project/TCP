@@ -18,7 +18,8 @@ export RESUME=True
 
 
 # TCP evaluation
-export ROUTES=leaderboard/data/evaluation_routes/routes_lav_valid.xml
+# export ROUTES=leaderboard/data/evaluation_routes/routes_lav_valid.xml
+export ROUTES=leaderboard/data/CITCoM_routes/routes_town01.xml
 export TEAM_AGENT=team_code/tcp_agent.py
 export TEAM_CONFIG="log/TCP/epoch=3-last.ckpt"
 export SCENARIOS=leaderboard/data/scenarios/all_towns_traffic_scenarios.json
