@@ -122,7 +122,7 @@ class LeaderboardEvaluator(object):
             print(e)
         dist = pkg_resources.get_distribution("carla")
 
-        random.seed(int(args.trafficManagerSeed))
+        # random.seed(int(args.trafficManagerSeed))
         self.percentage_speed_limit = None
         self.ideal_number_of_drivers = None
         self.ideal_number_of_walkers = None
@@ -299,7 +299,7 @@ class LeaderboardEvaluator(object):
             percentage_speed_limit=self.percentage_speed_limit,
             duration_time_system=self.manager.scenario_duration_system,
             duration_time_game=self.manager.scenario_duration_game,
-            ego_vehicle=self.ego_vehicle.type_id,
+            ego_vehicle=self.ego_vehicle,
             failure=crash_message
         )
 
@@ -378,15 +378,21 @@ class LeaderboardEvaluator(object):
             self._load_and_wait_for_world(args, config.town, config.ego_vehicles)
             self._prepare_ego_vehicles(config.ego_vehicles, False)
             if args.randomise:
-                scenario = RouteScenario(world=self.world, config=config, debug_mode=args.debug, ideal_number_of_drivers=random.randint(80, 200), ideal_number_of_walkers=random.randint(80, 200), ego_vehicle_model=args.egoVehicle)
+                model = random.choice(self.world.get_blueprint_library().filter('vehicle.*.*'))
+                scenario = RouteScenario(world=self.world, config=config, debug_mode=args.debug, ideal_number_of_drivers=random.randint(80, 200), ideal_number_of_walkers=random.randint(80, 200), ego_vehicle_model=random.choice())
             else:
-                print(f"scenario = RouteScenario(world={self.world}, config={config}, debug_mode={args.debug}, ideal_number_of_drivers={self.ideal_number_of_drivers}, ideal_number_of_walkers={self.ideal_number_of_walkers}, ego_vehicle_model={args.egoVehicle})")
-                scenario = RouteScenario(world=self.world, config=config, debug_mode=args.debug, ideal_number_of_drivers=self.ideal_number_of_drivers, ideal_number_of_walkers=self.ideal_number_of_walkers, ego_vehicle_model=args.egoVehicle)
+                print("NO RANDOMISATION")
+                model = random.choice(args.egoVehicle)
+                color = f"({random.randint(0, 256)},{random.randint(0, 256)},{random.randint(0, 256)})"
+                print(f"scenario = RouteScenario(world={self.world}, config={config}, debug_mode={args.debug}, ideal_number_of_drivers={self.ideal_number_of_drivers}, ideal_number_of_walkers={self.ideal_number_of_walkers}, ego_vehicle_model={model}), color={color}")
+                scenario = RouteScenario(world=self.world, config=config, debug_mode=args.debug, ideal_number_of_drivers=self.ideal_number_of_drivers, ideal_number_of_walkers=self.ideal_number_of_walkers, ego_vehicle_model=model, ego_vehicle_color=color)
             self.statistics_manager.set_scenario(scenario.scenario)
             scenario.scenario.number_of_drivers = len(scenario.drivers)
 
             # Hack to get the ego vehicle into the stats manager
             self.ego_vehicle = scenario.ego_vehicles[0]
+            # self.ego_vehicle.attributes["color"] = carla.Color(random.randint(0, 256),random.randint(0, 256),random.randint(0, 256))
+
 
             # self.agent_instance._init()
             # self.agent_instance.sensor_interface = SensorInterface()
@@ -577,13 +583,23 @@ def main():
     parser.add_argument('--egoVehicle',
                         type=str,
                         default=None,
+                        nargs="+",
                         # default='vehicle.lincoln.mkz2017',
                         help='The make and model of the ego vehicle.')
+    parser.add_argument('--color',
+                        type=int,
+                        default=None,
+                        nargs="+",
+                        # default='vehicle.lincoln.mkz2017',
+                        help='The color of the ego vehicle.')
     parser.add_argument('-r', '--randomise',
                     action='store_true')  # on/off flag
     arguments = parser.parse_args()
     print("init statistics_manager")
     statistics_manager = StatisticsManager()
+
+    if arguments.color:
+        assert 3 <= len(args) <= 4, "Color must be either 'r g b' or 'r g b a'."
 
     if arguments.randomise:
         assert arguments.percentSpeedLimit is None, "Cannot specify a percentSpeedLimit if randomisation is on."
@@ -591,15 +607,18 @@ def main():
         assert arguments.numberOfWalkers is None, "Cannot specify a numberOfWalkers if randomisation is on."
         assert arguments.numberOfWalkers is None, "Cannot specify a numberOfWalkers if randomisation is on."
         assert arguments.egoVehicle is None, "Cannot specify a egoVehicle if randomisation is on."
+        assert arguments.color is None, "Cannot specify a egoVehicle color if randomisation is on."
     else:
         if arguments.egoVehicle is None:
-            arguments.egoVehicle = 'vehicle.lincoln.mkz2017'
+            arguments.egoVehicle = ['vehicle.lincoln.mkz2017']
         if arguments.percentSpeedLimit is None:
             arguments.percentSpeedLimit = 70
-
+        if arguments.color is None:
+            arguments.color = [0,0,0]
 
     try:
         print("begin")
+        random.seed(int(arguments.trafficManagerSeed))
         leaderboard_evaluator = LeaderboardEvaluator(arguments, statistics_manager)
         leaderboard_evaluator.run(arguments)
 

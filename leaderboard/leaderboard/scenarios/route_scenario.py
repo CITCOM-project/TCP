@@ -182,7 +182,7 @@ class RouteScenario(BasicScenario):
 
 	category = "RouteScenario"
 
-	def __init__(self, world, config, debug_mode=0, criteria_enable=True, ideal_number_of_drivers=None, ideal_number_of_walkers=None, ego_vehicle_model="vehicle.lincoln.mkz2017"):
+	def __init__(self, world, config, debug_mode=0, criteria_enable=True, ideal_number_of_drivers=None, ideal_number_of_walkers=None, ego_vehicle_model="vehicle.lincoln.mkz2017", ego_vehicle_color=None):
 		"""
 		Setup all relevant parameters and create scenarios along route
 		"""
@@ -196,6 +196,7 @@ class RouteScenario(BasicScenario):
 		self.ideal_number_of_drivers = ideal_number_of_drivers
 		self.ideal_number_of_walkers = ideal_number_of_walkers
 		self.ego_vehicle_model = ego_vehicle_model
+		self.ego_vehicle_color = ego_vehicle_color
 
 		self._update_route(world, config, debug_mode>0)
 
@@ -263,7 +264,8 @@ class RouteScenario(BasicScenario):
 		ego_vehicle = CarlaDataProvider.request_new_actor(
 														  self.ego_vehicle_model,
 														  elevate_transform,
-														  rolename='hero')
+														  rolename='hero',
+														  color=self.ego_vehicle_color)
 
 		spectator = CarlaDataProvider.get_world().get_spectator()
 		ego_trans = ego_vehicle.get_transform()
