@@ -371,21 +371,20 @@ class LeaderboardEvaluator(object):
 
         # Load the world and the scenario
         try:
-            if args.randomise:
-                self.percentage_speed_limit = random.randint(50, 110) #Need to initialise this here for each loop round otherwise we get the same one for each run
-            else:
-                self.percentage_speed_limit = args.percentSpeedLimit
             self._load_and_wait_for_world(args, config.town, config.ego_vehicles)
             self._prepare_ego_vehicles(config.ego_vehicles, False)
             if args.randomise:
-                model = random.choice(self.world.get_blueprint_library().filter('vehicle.*.*'))
-                scenario = RouteScenario(world=self.world, config=config, debug_mode=args.debug, ideal_number_of_drivers=random.randint(80, 200), ideal_number_of_walkers=random.randint(80, 200), ego_vehicle_model=random.choice())
+                args.percentSpeedLimit = random.randint(50, 110) #Need to initialise this here for each loop round otherwise we get the same one for each run
+                model = random.choice([x.id for x in self.world.get_blueprint_library().filter('vehicle.*.*')])
+                color = f"({random.randint(0, 256)},{random.randint(0, 256)},{random.randint(0, 256)})"
+                scenario = RouteScenario(world=self.world, config=config, debug_mode=args.debug, ideal_number_of_drivers=random.randint(80, 200), ideal_number_of_walkers=random.randint(80, 200), ego_vehicle_model=model, ego_vehicle_color=color)
             else:
                 print("NO RANDOMISATION")
                 model = random.choice(args.egoVehicle)
                 color = f"({random.randint(0, 256)},{random.randint(0, 256)},{random.randint(0, 256)})"
                 print(f"scenario = RouteScenario(world={self.world}, config={config}, debug_mode={args.debug}, ideal_number_of_drivers={self.ideal_number_of_drivers}, ideal_number_of_walkers={self.ideal_number_of_walkers}, ego_vehicle_model={model}), color={color}")
                 scenario = RouteScenario(world=self.world, config=config, debug_mode=args.debug, ideal_number_of_drivers=self.ideal_number_of_drivers, ideal_number_of_walkers=self.ideal_number_of_walkers, ego_vehicle_model=model, ego_vehicle_color=color)
+            self.percentage_speed_limit = args.percentSpeedLimit
             self.statistics_manager.set_scenario(scenario.scenario)
             scenario.scenario.number_of_drivers = len(scenario.drivers)
 
@@ -408,7 +407,7 @@ class LeaderboardEvaluator(object):
             self.manager.load_scenario(scenario, self.agent_instance, config.repetition_index)
 
             for d in scenario.drivers:
-                self.traffic_manager.vehicle_percentage_speed_difference(d, 100 - args.percentSpeedLimit)
+                self.traffic_manager.vehicle_percentage_speed_difference(d, 100 - self.percentage_speed_limit)
 
         except Exception as e:
             # The scenario is wrong -> set the ejecution to crashed and stop

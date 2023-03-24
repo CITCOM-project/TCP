@@ -41,30 +41,31 @@ python3 ${LEADERBOARD_ROOT}/leaderboard/leaderboard_evaluator.py \
 --resume=${RESUME} \
 --port=${PORT} \
 --trafficManagerPort=${TM_PORT} \
---egoVehicle vehicle.audi.a2 \
-vehicle.audi.tt \
-vehicle.bmw.grandtourer \
-vehicle.yamaha.yzf \
-vehicle.audi.etron \
-vehicle.nissan.micra \
-vehicle.bh.crossbike \
-vehicle.lincoln.mkz2017 \
-vehicle.gazelle.omafiets \
-vehicle.tesla.cybertruck \
-vehicle.dodge_charger.police \
-vehicle.harley-davidson.low_rider \
-vehicle.bmw.isetta \
-vehicle.citroen.c3 \
-vehicle.diamondback.century \
-vehicle.tesla.model3 \
-vehicle.toyota.prius \
-vehicle.seat.leon \
-vehicle.kawasaki.ninja \
-vehicle.nissan.patrol \
-vehicle.mini.cooperst \
-vehicle.mercedes-benz.coupe \
-vehicle.jeep.wrangler_rubicon \
-vehicle.mustang.mustang \
-vehicle.volkswagen.t2 \
-vehicle.chevrolet.impala \
-vehicle.carlamotors.carlacola\
+--randomise
+# --egoVehicle vehicle.audi.a2 \
+# vehicle.audi.tt \
+# vehicle.bmw.grandtourer \
+# vehicle.yamaha.yzf \
+# vehicle.audi.etron \
+# vehicle.nissan.micra \
+# vehicle.bh.crossbike \
+# vehicle.lincoln.mkz2017 \
+# vehicle.gazelle.omafiets \
+# vehicle.tesla.cybertruck \
+# vehicle.dodge_charger.police \
+# vehicle.harley-davidson.low_rider \
+# vehicle.bmw.isetta \
+# vehicle.citroen.c3 \
+# vehicle.diamondback.century \
+# vehicle.tesla.model3 \
+# vehicle.toyota.prius \
+# vehicle.seat.leon \
+# vehicle.kawasaki.ninja \
+# vehicle.nissan.patrol \
+# vehicle.mini.cooperst \
+# vehicle.mercedes-benz.coupe \
+# vehicle.jeep.wrangler_rubicon \
+# vehicle.mustang.mustang \
+# vehicle.volkswagen.t2 \
+# vehicle.chevrolet.impala \
+# vehicle.carlamotors.carlacola\
