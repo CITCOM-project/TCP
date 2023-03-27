@@ -15,16 +15,16 @@ import sys
 RESULTS_FILE = sys.argv[1]
 BASENAME = RESULTS_FILE.split("/")[-2]
 
-collision_re = re.compile(r"Agent with velocity (\d+\.\d+((e-?\d+)?)) collided against object with type=\w+\.[\w-]+\.\w+ and id=\d+ and velocity (\d+\.\d+((e-?\d+)?)) at")
+collision_re = re.compile(r"Agent( with velocity (\d+\.\d+((e-?\d+)?)))? collided against object with type=[\w\-.]+ and id=\d+( and velocity (\d+\.\d+((e-?\d+)?)))? at")
 collision_re_inferfuser = re.compile(r"Agent collided against object with type=\w+\.[\w-]+\.\w+ and id=\d+ at")
 
 
 def get_velocity(collision):
     match = collision_re.match(collision)
-    if match:
-        return float(match.group(1)), float(match.group(4))
-    match = collision_re_inferfuser.match(collision)
     assert match is not None, f"COULD NOT MATCH '{collision}'"
+    if match and match.group(2) and match.group(5):
+        return float(match.group(2)), float(match.group(5))
+    match = collision_re_inferfuser.match(collision)
     return None, None
 
 routes = {}
@@ -35,7 +35,7 @@ with open(RESULTS_FILE) as f:
 for route in results['_checkpoint']['records']:
     route['basename'] = BASENAME
     if "weather" not in route:
-        continue
+        route['weather'] = []
     index = int(route.pop("index"))
     for weather in route['weather']:
         route[weather] = route['weather'][weather]
