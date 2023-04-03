@@ -128,9 +128,9 @@ class LeaderboardEvaluator(object):
         self.ideal_number_of_walkers = None
 
         if not args.randomise:
-            if args.numberOfDrivers:
+            if args.numberOfDrivers is not None:
                 self.ideal_number_of_drivers = int(args.numberOfDrivers)
-            if args.numberOfWalkers:
+            if args.numberOfWalkers is not None:
                 self.ideal_number_of_walkers = int(args.numberOfWalkers)
 
         # if dist.version != 'leaderboard':
@@ -381,7 +381,9 @@ class LeaderboardEvaluator(object):
             else:
                 print("NO RANDOMISATION")
                 model = random.choice(args.egoVehicle)
-                color = f"({random.randint(0, 256)},{random.randint(0, 256)},{random.randint(0, 256)})"
+                print("MODEL", model)
+                # color = f"({random.randint(0, 256)},{random.randint(0, 256)},{random.randint(0, 256)})"
+                color = "(0,0,0)"
                 print(f"scenario = RouteScenario(world={self.world}, config={config}, debug_mode={args.debug}, ideal_number_of_drivers={self.ideal_number_of_drivers}, ideal_number_of_walkers={self.ideal_number_of_walkers}, ego_vehicle_model={model}), color={color}")
                 scenario = RouteScenario(world=self.world, config=config, debug_mode=args.debug, ideal_number_of_drivers=self.ideal_number_of_drivers, ideal_number_of_walkers=self.ideal_number_of_walkers, ego_vehicle_model=model, ego_vehicle_color=color)
             self.percentage_speed_limit = args.percentSpeedLimit

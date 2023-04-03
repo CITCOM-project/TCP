@@ -26,7 +26,8 @@ import carla
 from srunner.scenariomanager.carla_data_provider import CarlaDataProvider
 from srunner.scenariomanager.timer import GameTime
 from srunner.scenariomanager.traffic_events import TrafficEvent, TrafficEventType
-
+import pyscreenshot
+import time
 
 class Criterion(py_trees.behaviour.Behaviour):
 
@@ -1797,10 +1798,16 @@ class RunningRedLightTest(Criterion):
                     rgt_lane_wp = self.rotate_point(carla.Vector3D(0.4 * lane_width, 0.0, location_wp.z), yaw_wp - 90)
                     rgt_lane_wp = location_wp + carla.Location(rgt_lane_wp)
 
-                    # Is the vehicle traversing the stop line?
+                    # # Is the vehicle traversing the stop line?
                     # debug = self._world.debug
-                    # debug.draw_line(lft_lane_wp + carla.Location(z=1), rgt_lane_wp + carla.Location(z=1))
-                    # debug.draw_line(tail_close_pt + carla.Location(z=1), tail_far_pt + carla.Location(z=1), color=carla.Color(0, 0, 255))
+                    # debug.draw_line(lft_lane_wp + carla.Location(z=2), rgt_lane_wp + carla.Location(z=1), thickness=0.2)
+                    # debug.draw_line(tail_close_pt + carla.Location(z=2), tail_far_pt + carla.Location(z=1), thickness=0.2, color=carla.Color(0, 0, 255))
+                    # time.sleep(0.2)
+                    # self._world.tick()
+                    # pic = pyscreenshot.grab(bbox=(1900,755,2411,1047))
+                    # pic.save("/tmp/screenshot.png")
+
+
                     if self.is_vehicle_crossing_line((tail_close_pt, tail_far_pt), (lft_lane_wp, rgt_lane_wp)):
 
                         self.test_status = "FAILURE"

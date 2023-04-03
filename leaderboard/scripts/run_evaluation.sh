@@ -21,13 +21,14 @@ export DATA_COLLECTION=True
 # TCP evaluation
 # export ROUTES=leaderboard/data/evaluation_routes/routes_lav_valid.xml
 export ROUTES=leaderboard/data/TCP_training_routes/routes_town01.xml
+export ROUTES=leaderboard/data/CITCoM_routes/routes_town01.xml
 export TEAM_AGENT=team_code/tcp_agent.py
 export TEAM_CONFIG="log/TCP/epoch=59-last.ckpt"
 export SCENARIOS=leaderboard/data/scenarios/all_towns_traffic_scenarios.json
 export SAVE_PATH=data/results_TCP/
-export CHECKPOINT_ENDPOINT=${SAVE_PATH}/results_TCP.json
+export CHECKPOINT_ENDPOINT=${SAVE_PATH}/results_TCP_screenshots.json
 
-
+rm -r $SAVE_PATH
 python3 ${LEADERBOARD_ROOT}/leaderboard/leaderboard_evaluator.py \
 --scenarios=${SCENARIOS}  \
 --routes=${ROUTES} \
@@ -41,8 +42,10 @@ python3 ${LEADERBOARD_ROOT}/leaderboard/leaderboard_evaluator.py \
 --resume=${RESUME} \
 --port=${PORT} \
 --trafficManagerPort=${TM_PORT} \
---randomise
-# --egoVehicle vehicle.audi.a2 \
+--numberOfWalkers=0 \
+--numberOfDrivers=0 \
+--egoVehicle=vehicle.bmw.isetta \
+# vehicle.audi.a2 \
 # vehicle.audi.tt \
 # vehicle.bmw.grandtourer \
 # vehicle.yamaha.yzf \

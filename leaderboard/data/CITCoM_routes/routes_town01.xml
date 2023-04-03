@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <routes>
-  <route id="0" town="Town01">
-    <weather id="WetSunset" cloudiness="20.000000" precipitation="0.000000" precipitation_deposits="50.000000" wind_intensity="0.350000" sun_azimuth_angle="270.000000" sun_altitude_angle="15.000000" fog_density="0.000000" fog_distance="0.000000" fog_falloff="0.000000" wetness="0.000000">
-      <waypoint x="90.644714" y="59.323166" z="0.0" pitch="0.0" roll="0.0" yaw="129.583725"/>
-      <waypoint x="88.410492" y="266.330322" z="0.0" pitch="0.0" roll="0.0" yaw="89.991280"/>
+  <route id="85" town="Town02">
+    <weather id="CloudySunset" cloudiness="80.000000" precipitation="0.000000" precipitation_deposits="0.000000" wind_intensity="0.350000" sun_azimuth_angle="270.000000" sun_altitude_angle="15.000000" fog_density="0.000000" fog_distance="0.000000" fog_falloff="0.000000" wetness="0.000000">
+      <waypoint x="-7.455037" y="184.021988" z="0.0" pitch="0.0" roll="0.0" yaw="89.987068"/>
+      <waypoint x="193.689056" y="202.349533" z="0.0" pitch="0.0" roll="0.0" yaw="-90.012947"/>
     </weather>
   </route>
 </routes>
