@@ -22,8 +22,8 @@ collision_re_inferfuser = re.compile(r"Agent collided against object with type=\
 def get_velocity(collision):
     match = collision_re.match(collision)
     assert match is not None, f"COULD NOT MATCH '{collision}'"
-    if match and match.group(2) and match.group(5):
-        return float(match.group(2)), float(match.group(5))
+    if match and match.group(3) and match.group(5):
+        return float(match.group(3)), float(match.group(5))
     match = collision_re_inferfuser.match(collision)
     return None, None
 
@@ -55,6 +55,8 @@ for route in results['_checkpoint']['records']:
         route.pop('friction')
     route.pop('meta')
     route.pop('scores')
+    if route['number_of_walkers'] is None:
+        route['number_of_walkers'] = 0
     routes[index] = route
 
 print(routes)
