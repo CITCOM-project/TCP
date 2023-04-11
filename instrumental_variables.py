@@ -31,7 +31,7 @@ inputs = [
     # "ego_vehicle_sticky_control",
     # "number_of_drivers", # Can't use as an instrument
     # "number_of_walkers", # Can't use as an instrument
-    "percentage_speed_limit",
+    # "percentage_speed_limit",
     "route_length",
 ]
 
@@ -127,12 +127,12 @@ adjusted_original = sm.OLS(
 
 data["Classical adjustment"] = {
     "datapoints": None,
-    "effect modified": round(adjusted_modified.params['duration_game'], 2), 
-    "modified low": float(adjusted_modified.conf_int().loc['duration_game'].round(2)[0]),
-    "modified high": float(adjusted_modified.conf_int().loc['duration_game'].round(2)[1]),
-    "effect original": round(adjusted_original.params['duration_game'], 2),
-    "original low": float(adjusted_original.conf_int().loc['duration_game'].round(2)[0]),
-    "original high": float(adjusted_original.conf_int().loc['duration_game'].round(2)[1]),
+    "effect modified": str(round(adjusted_modified.params['duration_game'], 2)), 
+    "modified low": str(adjusted_modified.conf_int().loc['duration_game'].round(2)[0]),
+    "modified high": str(adjusted_modified.conf_int().loc['duration_game'].round(2)[1]),
+    "effect original": str(round(adjusted_original.params['duration_game'], 2)),
+    "original low": str(adjusted_original.conf_int().loc['duration_game'].round(2)[0]),
+    "original high": str(adjusted_original.conf_int().loc['duration_game'].round(2)[1]),
 }
 
 
