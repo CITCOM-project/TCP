@@ -1,6 +1,6 @@
 #!/bin/bash
 # Roach data collection
-while getopts "p:d:w:s:v:c:" flag; do
+while getopts "p:d:w:s:v:c:r:" flag; do
   case "$flag" in
     p) percentSpeedLimit=$OPTARG;;
     d) numberOfDrivers=$OPTARG;;
@@ -8,6 +8,7 @@ while getopts "p:d:w:s:v:c:" flag; do
     s) trafficManagerSeed=$OPTARG;;
     v) egoVehicle=$OPTARG;;
     c) carlaVersion=$OPTARG;;
+    r) routeIndex=$OPTARG;;
   esac
 done
 
@@ -36,8 +37,6 @@ export DATA_COLLECTION=False
 
 # export ROUTES=${@:$OPTIND:1}
 # export SCENARIOS=${@:$OPTIND+1:1}
-export ROUTES=leaderboard/data/TCP_training_routes/routes_town01.xml
-export SCENARIOS=leaderboard/data/scenarios/all_towns_traffic_scenarios.json
 
 function join_by {
   local d=${1-} f=${2-}
@@ -57,6 +56,9 @@ export TEAM_AGENT=team_code/roach_ap_agent.py
 export TEAM_CONFIG=roach/config/config_agent.yaml
 export CHECKPOINT_ENDPOINT=$SAVE_PATH/data_collect_town01_results.json
 
+export ROUTES=leaderboard/data/TCP_training_routes/splitroutes_01/route_$routeIndex.xml
+# export ROUTES=leaderboard/data/TCP_training_routes/routes_town01.xml
+export SCENARIOS=leaderboard/data/scenarios/all_towns_traffic_scenarios.json
 python3 ${LEADERBOARD_ROOT}/leaderboard/leaderboard_evaluator.py \
 --scenarios=${SCENARIOS}  \
 --routes=${ROUTES} \

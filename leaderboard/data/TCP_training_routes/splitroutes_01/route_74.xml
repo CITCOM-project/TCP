@@ -1,0 +1,7 @@
+<routes><route id="0" town="Town01">
+    <weather id="HardRainNight" cloudiness="90.000000" precipitation="60.000000" precipitation_deposits="100.000000" wind_intensity="1.000000" sun_azimuth_angle="225.000000" sun_altitude_angle="-80.000000" fog_density="0.000000" fog_distance="0.000000" fog_falloff="0.000000" wetness="0.000000">
+      <waypoint x="-1.983519" y="267.958374" z="0.0" pitch="0.0" roll="0.0" yaw="90.007477" />
+      <waypoint x="117.620636" y="330.591492" z="0.0" pitch="0.0" roll="0.0" yaw="0.006119" />
+    </weather>
+  </route>
+  </routes>
