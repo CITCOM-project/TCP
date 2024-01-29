@@ -19,11 +19,7 @@ parser.add_argument("-c", "--carla_version", type=int)
 parser.add_argument("-r", "--index", type=int)
 
 data = []
-<<<<<<< HEAD
 for fname in sorted(list(glob("results/*/data_collect*.json"))):
-=======
-for fname in glob("results/*/data_collect*.json"):
->>>>>>> 589485240e652f41e88f6d483490cc2dc8bde315
     args = os.path.normpath(fname).split(os.sep)[-2]
     args = vars(parser.parse_args(args.split("_")))
     with open(fname) as f:
