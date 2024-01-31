@@ -52,8 +52,10 @@ export SAVE_PATH="results/$SAVE_DIR"
 
 # export SAVE_PATH=data/data_collect_town01_results_weather_20/
 
-export TEAM_AGENT=team_code/roach_ap_agent.py
-export TEAM_CONFIG=roach/config/config_agent.yaml
+# export TEAM_AGENT=team_code/roach_ap_agent.py
+# export TEAM_CONFIG=roach/config/config_agent.yaml
+export TEAM_AGENT=team_code/tcp_agent.py
+export TEAM_CONFIG="agents/epoch=59-last.ckpt"
 export CHECKPOINT_ENDPOINT=$SAVE_PATH/data_collect_town01_results.json
 
 export ROUTES=leaderboard/data/TCP_training_routes/splitroutes_01/route_$routeIndex.xml
