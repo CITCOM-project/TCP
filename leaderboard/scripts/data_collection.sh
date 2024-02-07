@@ -28,7 +28,7 @@ export CHALLENGE_TRACK_CODENAME=SENSORS
 export PORT=2000
 export TM_PORT=8000
 export DEBUG_CHALLENGE=0
-export REPETITIONS=1 # multiple evaluation runs
+export REPETITIONS=5 # multiple evaluation runs
 export RESUME=True
 export DATA_COLLECTION=False
 
@@ -55,7 +55,7 @@ export SAVE_PATH="results/$SAVE_DIR"
 # export TEAM_AGENT=team_code/roach_ap_agent.py
 # export TEAM_CONFIG=roach/config/config_agent.yaml
 export TEAM_AGENT=team_code/tcp_agent.py
-export TEAM_CONFIG="agents/epoch=59-last.ckpt"
+export TEAM_CONFIG="TCP-agent/epoch=59-last.ckpt"
 export CHECKPOINT_ENDPOINT=$SAVE_PATH/data_collect_town01_results.json
 
 export ROUTES=leaderboard/data/TCP_training_routes/splitroutes_01/route_$routeIndex.xml
