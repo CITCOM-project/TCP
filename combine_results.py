@@ -52,7 +52,7 @@ data["system_time"] = data.pop("duration_system")
 infractions = data.filter(regex="collisions_.*|red_light|.*_infraction")
 data["infraction_name"] = pd.from_dummies(infractions[infractions.columns], default_category="none")
 
-dag = nx.Graph(nx.nx_pydot.read_dot("../case-studies/new/dag.dot"))
+dag = nx.Graph(nx.nx_pydot.read_dot("../studied-cases/dag.dot"))
 
 for n in sorted(dag.nodes):
     print(n.ljust(18), n in data)
