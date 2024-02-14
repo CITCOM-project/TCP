@@ -12,6 +12,11 @@ import os
 import argparse
 import pandas as pd
 import networkx as nx
+import re
+
+lane_re = re.compile(
+    r"Agent went outside its route lanes for about ([\d.]+) meters \(([\d.]+)% of the completed route\)"
+)
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-v", "--ego_vehicle", type=str)
@@ -32,7 +37,13 @@ for fname in sorted(list(glob("results/*/data_collect*.json"))):
         # assert len(records) == 1, f"Bad record {args} ({len(records)})"
         record = records[0]
     record.pop("friction")
-    record = record | {k: len(v) for k, v in record.pop("infractions").items()}
+    infractions = record.pop("infractions")
+    record = record | {k: len(v) for k, v in infractions.items()}
+    record["outside_route_lanes"] = (
+        float(lane_re.match(infractions["outside_route_lanes"][0]).group(2))
+        if len(infractions["outside_route_lanes"]) > 0
+        else 0
+    )
     record = record | record.pop("weather")
     record = record | record.pop("scores")
     record = record | record.pop("meta")
