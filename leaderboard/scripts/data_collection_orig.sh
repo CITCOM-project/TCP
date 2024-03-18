@@ -24,9 +24,9 @@ export DATA_COLLECTION=True
 export ROUTES=leaderboard/data/training_routes/weather_routes_town01_short.xml
 export TEAM_AGENT=team_code/roach_ap_agent.py
 export TEAM_CONFIG=roach/config/config_agent.yaml
-export CHECKPOINT_ENDPOINT=data/data_interfuser_town01_results/results.json
+export CHECKPOINT_ENDPOINT=data/data_TCP_town01_results/results.json
 export SCENARIOS=leaderboard/data/scenarios/all_towns_traffic_scenarios.json
-export SAVE_PATH=data/data_interfuser_town01_results/routes/
+export SAVE_PATH=data/data_TCP_town01_results/routes/
 
 
 
