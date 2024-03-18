@@ -1,4 +1,6 @@
 #!/bin/bash
+# modified by michael
+
 export CARLA_ROOT=../CARLA
 export CARLA_SERVER=${CARLA_ROOT}/CarlaUE4.sh
 export PYTHONPATH=$PYTHONPATH:${CARLA_ROOT}/PythonAPI

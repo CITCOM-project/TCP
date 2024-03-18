@@ -1,5 +1,7 @@
 #!/bin/bash
 # Roach data collection
+# @author michael
+
 while getopts "p:d:w:s:v:c:r:" flag; do
   case "$flag" in
     p) percentSpeedLimit=$OPTARG;;
